@@ -10,7 +10,7 @@ export default new Vuex.Store({
     zUser: JSON.parse(localStorage.getItem('zUser')) || {}
   },
   mutations: {
-    setisLoginingHandle (state, value) {
+    setIsLoginingHandle (state, value) {
       console.log(value)
       state.isLogining = value
     },

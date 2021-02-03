@@ -82,16 +82,16 @@ export default {
     const loginState = sessionData('get', 'login')
 
     if (loginState === 'true') {
-      this.$store.commit('setisLoginingHandle', true)
+      this.$store.commit('setIsLoginingHandle', true)
       sessionData('clean', 'login')
       getGithubAOuthInfo(queryParam)
         .then((res) => {
           console.log(res)
           this.$store.commit('setuserInfo', res.data)
-          this.$store.commit('setisLoginingHandle', false)
+          this.$store.commit('setIsLoginingHandle', false)
         })
         .catch(() => {
-          this.$store.commit('setisLoginingHandle', false)
+          this.$store.commit('setIsLoginingHandle', false)
         })
     }
   },
