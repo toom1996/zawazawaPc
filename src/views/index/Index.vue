@@ -2,9 +2,7 @@
   <div class="container">
     <div class="row">
       <!-- Main Content -->
-      <div
-        class="col col-xl-8  col-lg-8 col-md-8 col-sm-8 col-12"
-      >
+      <div class="col col-xl-8 col-lg-8 col-md-8 col-sm-8 col-12">
         <div class="zawazawa-center-block mb-1">
           <div class="ui-block">
             <div class="post-block mb-4">
@@ -101,17 +99,101 @@
         </div>
       </div>
     </div>
-    <b-avatar></b-avatar>
+    <b-modal id="zawazawa-publish-modal" @shown="focusPublishEditorHandle">
+      <div class="zawazawa-publish-container-block">
+        <div class="row">
+          <div class="col-md-2">
+            <b-avatar icon="plus"></b-avatar>
+          </div>
+          <div class="col-md-10">
+            <span
+              v-show="publish.zawazawaContent === ''"
+              class="publish-editor-placeholder"
+              >说点什么吧</span
+            >
+            <div
+              ref="textarea"
+              id="textarea"
+              class="publish-editor__textarea"
+              contenteditable="true"
+              @input="changeText"
+            >
+              <span contenteditable="true"></span>
+
+            </div>
+            <!-- <b-form-input ref="focusThis"></b-form-input>
+            <publish-editor :content="publish.zawazawaContent" @publishContent="changePublishContentHandle" v-model="publish.zawazawaContent"></publish-editor> -->
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2">
+          </div>
+          <div class="col-md-10">
+            <div
+              contenteditable="false"
+            >
+              <span contenteditable="false"><img
+                  class="mr-2"
+                  src="https://www.baidu.com/img/flexible/logo/pc/result.png"
+                  alt="author"
+                /><b-button class="float-right" pill variant="primary" @click="test()"> OK </b-button></span>
+            </div>
+            <!-- <b-form-input ref="focusThis"></b-form-input>
+            <publish-editor :content="publish.zawazawaContent" @publishContent="changePublishContentHandle" v-model="publish.zawazawaContent"></publish-editor> -->
+          </div>
+        </div>
+      </div>
+      <template #modal-footer="{ ok, cancel, hide }">
+        <div class="row" style="display:contents">
+          <div class="col-md-2">
+          </div>
+          <div class="col-md-10">
+            <a v-b-tooltip.hover.top="'上传图片'" class="m-2" href="javascript:void(0);"><b-icon icon="images" scale="1.5" shift-v="1.5" aria-hidden="true"></b-icon></a>
+            <b-button class="float-right" pill variant="primary" @click="test()"> OK </b-button>
+          </div>
+        </div>
+      </template>
+    </b-modal>
+    <div class="float-button">
+      <a href="javascript:void(0);" v-b-modal.zawazawa-publish-modal
+        ><b-avatar icon="plus" v-b-tooltip.hover.top="'发!'"></b-avatar
+      ></a>
+    </div>
   </div>
 </template>
 <script>
 import { getGithubAOuthInfo } from '@/api/user.js'
 import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
+
 export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
     'avatar-group': avatarGroup
+  },
+  data: function () {
+    return {
+      publish: {
+        zawazawaContent: ''
+      }
+    }
+  },
+  methods: {
+    changeText (e) {
+      console.log(e)
+      this.publish.zawazawaContent = e.target.innerText
+    },
+    focusPublishEditorHandle () {
+      const ele = document.getElementById('textarea')
+      if (this.publish.zawazawaContent !== '') {
+        ele.innerText = this.publish.zawazawaContent
+      } else {
+        this.$refs.textarea.focus()
+      }
+    },
+    test () {
+      console.log(this.publish.zawazawaContent)
+    }
   },
   created () {
     const queryParam = this.$route.query
@@ -313,5 +395,19 @@ ul {
   font-size: 70%;
   font-weight: 700;
   z-index: 1;
+}
+.float-button {
+  position: fixed;
+  bottom: 5rem;
+  right: 1rem;
+}
+.publish-editor__textarea {
+  box-shadow: none;
+  outline: none;
+  border: none;
+  min-height: 1rem;
+}
+.publish-editor-placeholder {
+  position: absolute;
 }
 </style>
