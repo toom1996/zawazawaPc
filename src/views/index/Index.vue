@@ -182,9 +182,60 @@ export default {
     changeText (e) {
       console.log(e)
       this.publish.zawazawaContent = e.target.innerText
+      const ele = document.getElementById('textarea')
+      ele.value = this.publish.zawazawaContent
     },
     focusPublishEditorHandle () {
       const ele = document.getElementById('textarea')
+      ele.addEventListener('paste', function (e) {
+        console.log(e)
+        if (e.clipboardData) {
+          // 阻止默认行为
+          e.preventDefault()
+          var clipboardData = e.clipboardData
+          // 获取剪贴板的文本
+          var text = clipboardData.getData('text')
+          // console.log(text)
+          // if (window.getSelection && text !== '' && text !== null) {
+          // 为input添加监听事件方便对剪贴板内容进行二次修改
+
+          // 使用ClipboardApi来设置剪贴板里的内容
+          // 参考张鑫旭的博客， 需要的文末有地址
+          // var clipboardData = e.clipboardData || window.clipboardData
+          if (!clipboardData) {
+            return
+          }
+          // var text = window.getSelection().toString()
+          console.log(text)
+          if (text) {
+            clipboardData.setData('text/plain', 'ddddd')
+          }
+          clipboardData.setData('text/plain', 'ddddd')
+          // 执行复制操作
+          if (document.execCommand('copy')) {
+            console.log('复制成功')
+          } else {
+            console.log('复制失败')
+          }
+          // return false
+          // var range2 = document.createRange()
+          // range2.setStart(ele, 0)
+          // range2.setEnd(ele, 0)
+          // // 创建文本节点
+          // var textNode = document.createTextNode(text)
+          // // 在当前的光标处插入文本节点
+          // var range = window.getSelection().getRangeAt(0)
+
+          // // 插入文本
+          // range.insertNode(textNode)
+
+          // range.removeAllRanges()
+          // 删除选中文本
+          // range.deleteContents()
+          // }
+          // return false
+        }
+      })
       if (this.publish.zawazawaContent !== '') {
         ele.innerText = this.publish.zawazawaContent
       } else {
@@ -196,6 +247,7 @@ export default {
     }
   },
   created () {
+    // 是否存在登陆信息
     const queryParam = this.$route.query
     const loginState = sessionData('get', 'login')
 
@@ -349,7 +401,7 @@ ul {
   overflow: visible;
   position: relative;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  box-shadow 0.15s ease-in-out;
 }
 
 .control-block-button .btn-control {
