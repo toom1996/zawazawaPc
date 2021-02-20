@@ -122,59 +122,33 @@
               class="publish-editor__textarea"
               contenteditable="true"
               @input="changeText"
+              @paste="changeText"
+              οndragstart="return false"
             >
               <span contenteditable="true"></span>
             </div>
             <div contenteditable="false">
-              <span style="pointer-events: none" contenteditable="false">
-                <div class="publish-editor-image-block">
-                  <div class="row">
-                    <div
-                      class="col-sm-6"
-                      style="
-                        background: url(https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.mp.itc.cn%2Fupload%2F20161226%2F67eb3c852f6943cebb3f6cd12e32c38c_th.jpeg&refer=http%3A%2F%2Fimg.mp.itc.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1615132692&t=0b863e6405908770d7bad1587172a92b);
-                        background-size: cover;
-                        height: 20rem;
-                        background-clip: content-box;
-                      "
-                    >
-                      <!-- <b-img
-                        class="mr-2"
-                        rounded
-                        src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.mp.itc.cn%2Fupload%2F20161226%2F67eb3c852f6943cebb3f6cd12e32c38c_th.jpeg&refer=http%3A%2F%2Fimg.mp.itc.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1615132692&t=0b863e6405908770d7bad1587172a92b"
-                        alt="author"
-                      /> -->
-                    </div>
-                    <div
-                      class="col-sm-6"
-                      style="
-                        background: url(https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.mp.itc.cn%2Fupload%2F20161226%2F67eb3c852f6943cebb3f6cd12e32c38c_th.jpeg&refer=http%3A%2F%2Fimg.mp.itc.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1615132692&t=0b863e6405908770d7bad1587172a92b);
-                        background-size: cover;
-                        height: 20rem;
-                        background-clip: content-box;
-                      "
-                    >
-                      <!-- <b-img
-                        class="mr-2"
-                        rounded
-                        src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.mp.itc.cn%2Fupload%2F20161226%2F67eb3c852f6943cebb3f6cd12e32c38c_th.jpeg&refer=http%3A%2F%2Fimg.mp.itc.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1615132692&t=0b863e6405908770d7bad1587172a92b"
-                        alt="author"
-                      /> -->
-                    </div>
+              <div class="publish-editor-image-block">
+                <div class="row m-0">
+                  <!-- 图片 -->
+                  <div
+                    v-for="(item, index) in publish.zawazawaContentImage" v-bind:key="index"
+                    class="publish-editor-image"
+                    :class="{'col-sm-12':publish.zawazawaContentImage.length === 1, 'col-sm-6':publish.zawazawaContentImage.length >= 2}"
+                    :style="{backgroundImage: 'url(' + (item.source) + ')'}"
+                  >
+                    <b-iconstack font-scale="2" class="m-1 publish-editor-image-clear" @click="test(index)">
+                      <b-icon
+                        stacked
+                        icon="circle-fill"
+                        style="color: #190c06"
+                      ></b-icon>
+                      <b-icon stacked icon="x" style="color: #ffffff"></b-icon>
+                    </b-iconstack>
                   </div>
-
-                  <!-- <b-img
-                    class="mr-2"
-                    rounded
-                    src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwx4.sinaimg.cn%2Fmw690%2F002pzDKdly1gm6si0ihr4j60ku6bdnpe02.jpg&refer=http%3A%2F%2Fwx4.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1615172020&t=9fb5973edbec5f980a8193a92e11590a"
-                    alt="author"
-                  /> -->
                 </div>
-              </span>
+              </div>
             </div>
-
-            <!-- <b-form-input ref="focusThis"></b-form-input>
-            <publish-editor :content="publish.zawazawaContent" @publishContent="changePublishContentHandle" v-model="publish.zawazawaContent"></publish-editor> -->
           </div>
         </div>
       </div>
@@ -193,13 +167,7 @@
                 shift-v="1.5"
                 aria-hidden="true"
               ></b-icon
-              ><b-form-file
-                multiple
-                id="file"
-                v-model="file"
-                class="mt-3"
-                plain
-              ></b-form-file>
+              ><input v-show="false" id="file" type="file" class="upload" @change="addImg" ref="inputer" multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
             </a>
             {{ publish.zawazawaContentLength }}
             <b-button
@@ -222,146 +190,164 @@
   </div>
 </template>
 <script>
-import { getGithubAOuthInfo } from "@/api/user.js";
-import { sessionData } from "@/utils/common.js";
-import avatarGroup from "@/components/common/AvatarGroup";
+import { getGithubAOuthInfo } from '@/api/user.js'
+import { sessionData } from '@/utils/common.js'
+import avatarGroup from '@/components/common/AvatarGroup'
 
 export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
-    "avatar-group": avatarGroup,
+    'avatar-group': avatarGroup
   },
   data: function () {
     return {
       publish: {
-        zawazawaContent: "",
+        zawazawaContent: '',
         zawazawaContentLength: 0,
+        zawazawaContentImage: [
+        ]
       },
-      file: [], //上传文件对象
-    };
+      file: [] // 上传文件对象
+    }
   },
   methods: {
-    openFileModal() {
-      document.getElementById("file").click();
+    addImg (e) {
+      console.log(e)
+      for (let i = 0; i < e.target.files.length; i++) {
+        const file = e.target.files[i]
+        console.log(file)
+        // 上传大小限制 10M
+        if (file.size >= 1048576) {
+          alert('请选择5M以内的图片！')
+          return false
+        }
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = () => {
+          this.publish.zawazawaContentImage.push({ source: reader.result })
+          console.log(this.publish.zawazawaContentImage)
+        }
+      }
     },
-    //获得输入框中字符长度
-    getLength(val) {
-      let emoji_exp = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+    // 打开上传图片按钮
+    openFileModal () {
+      document.getElementById('file').click()
+    },
+    // 获得输入框中字符长度
+    getLength (val) {
+      const emojiExp = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g
 
-      function estring(str) {
-        const ms = [...str.matchAll(emoji_exp)];
-        if (!ms || !ms.length) return str.length;
+      function estring (str) {
+        const ms = [...str.matchAll(emojiExp)]
+        if (!ms || !ms.length) return str.length
 
-        let emojiSize = 0;
-        for (const m of ms) emojiSize += m.length - 1;
-        return str.length - emojiSize;
+        let emojiSize = 0
+        for (const m of ms) emojiSize += m.length - 1
+        return str.length - emojiSize
       }
 
-      return estring(val); // 4
+      return estring(val) // 4
     },
-    changeText(e) {
-      console.log(e);
-      this.publish.zawazawaContent = e.target.innerText;
-      this.publish.zawazawaContentLength = this.getLength(e.target.innerText);
-    },
-    insertAtCursor(jsDom, html) {
-      console.log(1111111)
-      
-      if (jsDom != document.activeElement) {
-        console.log(2222)
-        // 如果dom没有获取到焦点，追加
-        jsDom.innerHTML = jsDom.innerHTML + html;
-        return;
+    // 内容改变事件
+    changeText (e) {
+      console.log(e)
+      if (e.type === 'input') {
+        if (e.inputType === 'insertFromDrop') {
+          console.log('dd')
+          e.preventDefault()
+        }
+      } else if (e.type === 'paste') {
+        if (e.clipboardData) {
+          var text = e.clipboardData.getData('text')
+          // 取消浏览器的默认动作，一般一定要有，请谨慎使用
+          e.preventDefault()
+          console.log(e.clipboardData.getData('text'))
+          this.insertAtCursor(text)
+        }
       }
-      var sel, range;
+      this.publish.zawazawaContent = e.target.innerText
+      this.publish.zawazawaContentLength = this.getLength(e.target.innerText)
+    },
+    // 游标粘贴
+    insertAtCursor (content) {
+      var sel, range
       if (window.getSelection) {
         // IE9 或 非IE浏览器
         // debugger;
-        sel = window.getSelection();
+        sel = window.getSelection()
         if (sel.getRangeAt && sel.rangeCount) {
-          range = sel.getRangeAt(0);
-          range.deleteContents();
+          range = sel.getRangeAt(0)
+          range.deleteContents()
           // Range.createContextualFragment() would be useful here but is
           // non-standard and not supported in all browsers (IE9, for one)
-          var el = document.createElement("div");
-          el.innerHTML = html;
-          var frag = document.createDocumentFragment(),
-            node,
-            lastNode;
+          var el = document.createElement('div')
+          el.innerHTML = content
+          var frag = document.createDocumentFragment()
+          var node
+          var lastNode
           while ((node = el.firstChild)) {
-            lastNode = frag.appendChild(node);
+            lastNode = frag.appendChild(node)
           }
-          range.insertNode(frag);
+          range.insertNode(frag)
           // Preserve the selection
           if (lastNode) {
-            range = range.cloneRange();
-            range.setStartAfter(lastNode);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            range = range.cloneRange()
+            range.setStartAfter(lastNode)
+            range.collapse(true)
+            sel.removeAllRanges()
+            sel.addRange(range)
           }
         }
-      } else if (document.selection && document.selection.type != "Control") {
-        // IE < 9
-        document.selection.createRange().pasteHTML(html);
       }
     },
-    focusPublishEditorHandle() {
-      const ele = document.getElementById("textarea");
-      ele.addEventListener("paste",  (e) => {
-        if (e.clipboardData) {
-          var text = e.clipboardData.getData('text')
-          //取消浏览器的默认动作，一般一定要有，请谨慎使用
-          e.preventDefault();
-          console.log(e.clipboardData.getData('text'))
-          this.insertAtCursor(ele, text);
-          return false;
-        }
-      });
-      if (this.publish.zawazawaContent !== "") {
-        ele.innerText = this.publish.zawazawaContent;
+    // modal触发焦点
+    focusPublishEditorHandle () {
+      const ele = document.getElementById('textarea')
+      if (this.publish.zawazawaContent !== '') {
+        ele.innerText = this.publish.zawazawaContent
       } else {
-        this.$refs.textarea.focus();
+        this.$refs.textarea.focus()
       }
     },
-    test() {
-      console.log(this.file);
-    },
+    test (i) {
+      this.publish.zawazawaContentImage.splice(i, 1) // 结果arr=['a','c','d']（下标1开始，删除1个）
+      console.log(this.file)
+    }
   },
-  created() {
-    const queryParam = this.$route.query;
-    const loginState = sessionData("get", "login");
+  created () {
+    const queryParam = this.$route.query
+    const loginState = sessionData('get', 'login')
 
-    if (loginState === "true") {
-      this.$store.commit("setIsLoginingHandle", true);
-      sessionData("clean", "login");
+    if (loginState === 'true') {
+      this.$store.commit('setIsLoginingHandle', true)
+      sessionData('clean', 'login')
       getGithubAOuthInfo(queryParam)
         .then((res) => {
-          console.log(res);
-          this.$store.commit("setuserInfo", res.data);
-          this.$store.commit("setIsLoginingHandle", false);
+          console.log(res)
+          this.$store.commit('setuserInfo', res.data)
+          this.$store.commit('setIsLoginingHandle', false)
         })
         .catch(() => {
-          this.$store.commit("setIsLoginingHandle", false);
-        });
+          this.$store.commit('setIsLoginingHandle', false)
+        })
     }
   },
   computed: {
-    popoverConfig() {
+    popoverConfig () {
       // Both title and content specified as a function in this example
       // and will be called the each time the popover is opened
       return {
         html: false,
         content: () => {
-          const count = 5;
-          return <avatar-group text={count}></avatar-group>;
+          const count = 5
+          return <avatar-group text={count}></avatar-group>
           // Note this is called only when the popover is opened
           // return 'The date is:<br><em>' + new Date() + '</em>'
-        },
-      };
-    },
-  },
-};
+        }
+      }
+    }
+  }
+}
 </script>
 <style scoped>
 .zawazawa-center-block {
@@ -542,5 +528,19 @@ ul {
 }
 .publish-editor-placeholder {
   position: absolute;
+  /** 点击穿透 */
+  pointer-events: none;
+}
+.publish-editor-image-clear {
+  cursor: pointer;
+}
+.publish-editor-image {
+  background-size: cover;
+  height: 20rem;
+  background-clip: content-box;
+  padding: 0.5rem;
+  border-radius: 1.5rem;
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 </style>
