@@ -48,4 +48,7 @@ export default {
     }
   }
 }
+.toast-header {
+  display: none !important;
+}
 </style>
