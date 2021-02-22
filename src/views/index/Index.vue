@@ -371,6 +371,8 @@ export default {
     },
     // modal触发焦点
     focusPublishEditorHandle () {
+      // TODO: 登陆权限的验证
+
       const ele = document.getElementById('textarea')
       if (this.publish.zawazawaContent !== '') {
         ele.innerText = this.publish.zawazawaContent
