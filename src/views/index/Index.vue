@@ -108,6 +108,7 @@
                 class="mb-2"
                 id="input-1"
                 type="email"
+                v-model="login.mobile"
                 placeholder="手机号"
                 required
               ></b-form-input>
@@ -137,7 +138,7 @@
                 </div>
               </div>
             </div>
-            <b-button block variant="primary">登陆</b-button>
+            <b-button block variant="primary" @click="registerHandle()">登陆</b-button>
             <div class="row m-2">
               <div class="col-sm-4 auth-block">
                 <i class="fa fa-wechat"></i><span class="col-sm4">微信</span>
@@ -245,7 +246,7 @@
   </div>
 </template>
 <script>
-import { getGithubAOuthInfo } from '@/api/user.js'
+import { getGithubAOuthInfo, register } from '@/api/user.js'
 import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
@@ -262,10 +263,23 @@ export default {
         zawazawaContentLength: 0,
         zawazawaContentImage: []
       },
+      login: {
+        mobile: '',
+        code: ''
+      },
       file: [] // 上传文件对象
     }
   },
   methods: {
+    registerHandle () {
+      register(this.login)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch(() => {
+          
+        })
+    },
     addImg (e) {
       console.log(e)
       for (let i = 0; i < e.target.files.length; i++) {
