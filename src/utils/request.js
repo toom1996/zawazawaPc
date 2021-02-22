@@ -1,8 +1,9 @@
 import axios from 'axios'
+import Vue from 'vue';
 import qs from 'qs'
-import store from '../store'
 
-console.log(store.state.count)
+let v = new Vue();
+// console.log(store.state.count)
 // create an axios instance
 axios.defaults.timeout = 60000
 axios.defaults.baseURL = process.env.VUE_APP_API
@@ -44,10 +45,8 @@ axios.interceptors.response.use(
    */
   (response) => {
     const res = response.data
-
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 0) {
-      console.log('err')
+    if (res.code !== 200) {
 
       if (res.code === 401) {
         // 登录过期
@@ -65,17 +64,28 @@ axios.interceptors.response.use(
         //   })
         // })
       }
-      // return Promise.reject(new Error('ddd' || 'Error'))
+
+      if (res.code !== 200) {
+        console.log('ljq')
+      }
+      v.$bvToast.toast(res.msg || '服务器异常', {
+          toaster: 'b-toaster-bottom-center',
+          autoHideDelay: 3000,
+          variant: 'danger',
+          appendToast: false
+        })
+      return Promise.reject(new Error(res.msg || '服务器异常'))
     }
     return response
   },
   (error) => {
     console.log(error)
     console.log('err' + error) // for debug
-    // Message({
-    //   message: error.message,
-    //   type: 'error',
-    //   duration: 3000
+    // v.$bvToast.toast(error.Error, {
+    //   toaster: 'b-toaster-bottom-center',
+    //   autoHideDelay: 3000,
+    //   variant: 'danger',
+    //   appendToast: false
     // })
     console.log('err')
     return Promise.reject(error)
