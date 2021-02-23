@@ -121,13 +121,15 @@
                           ><b-input-group class="mb-3">
                             <b-form-input
                               placeholder="短信验证码"
+                              v-model="login.code"
                             ></b-form-input>
                             <b-input-group-append>
                               <b-button
+                                @click="smsSendHandle()"
                                 size="sm"
                                 text="Button"
                                 variant="success"
-                                >发送验证码</b-button
+                                >发送验证码 {{smsTimer == 0 ? '': '(' + smsTimer + ')'}}</b-button
                               >
                             </b-input-group-append>
                           </b-input-group>
@@ -138,7 +140,12 @@
                 </div>
               </div>
             </div>
-            <b-button block variant="primary" @click="registerHandle()">登陆</b-button>
+            <b-overlay :show="this.$store.state.isLogining" rounded opacity="0.6"
+              ><b-button block variant="primary" @click="registerHandle()"
+                >登陆</b-button
+              ></b-overlay
+            >
+
             <div class="row m-2">
               <div class="col-sm-4 auth-block">
                 <i class="fa fa-wechat"></i><span class="col-sm4">微信</span>
@@ -158,6 +165,7 @@
       size="lg"
       id="zawazawa-publish-modal"
       @shown="focusPublishEditorHandle"
+      @show="publishEditorModalShow"
     >
       <div class="zawazawa-publish-container-block">
         <div class="row">
@@ -198,9 +206,12 @@
         <div class="row" style="display: contents">
           <div class="col-md-2"></div>
           <div class="col-md-10">
-            <b-button @click="openFileModal"
+            <b-button
+              @click="openFileModal"
               v-b-tooltip.hover.top="'上传图片'"
-               size="sm" variant="primary">
+              size="sm"
+              variant="primary"
+            >
               <b-icon
                 icon="images"
                 scale="1.5"
@@ -208,7 +219,16 @@
                 aria-hidden="true"
               ></b-icon>
             </b-button>
-            <input v-show="false" id="file" type="file" class="upload" @change="addImg" ref="inputer" multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
+            <input
+              v-show="false"
+              id="file"
+              type="file"
+              class="upload"
+              @change="addImg"
+              ref="inputer"
+              multiple
+              accept="image/png,image/jpeg,image/gif,image/jpg"
+            />
             <b-button
               class="float-right"
               pill
@@ -246,7 +266,7 @@
   </div>
 </template>
 <script>
-import { getGithubAOuthInfo, register } from '@/api/user.js'
+import { getGithubAOuthInfo, register, smsSend } from '@/api/user.js'
 import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
@@ -267,18 +287,32 @@ export default {
         mobile: '',
         code: ''
       },
-      file: [] // 上传文件对象
+      file: [], // 上传文件对象
+      smsTimer: 0
     }
   },
   methods: {
+    // 发送短信处理函数
+    smsSendHandle () {
+      // if (this.login.mobile)
+      this.smsTimer = 60
+      smsSend({
+        mobile: this.login.mobile
+      }).then((e) => {
+        console.log(e)
+      })
+    },
+
+    // 登陆处理函数
     registerHandle () {
-      register(this.login)
-        .then((res) => {
-          console.log(res)
-        })
-        .catch(() => {
-          
-        })
+      this.smsTimer = 60
+      this.$store.commit('setIsLoginingHandle', true)
+      register(this.login).then((res) => {
+        this.$store.commit('setuserInfo', res.data)
+        this.$store.commit('setIsLoginingHandle', false)
+      }).catch((e) => {
+        this.$store.commit('setIsLoginingHandle', false)
+      })
     },
     addImg (e) {
       console.log(e)
@@ -393,6 +427,9 @@ export default {
       } else {
         this.$refs.textarea.focus()
       }
+    },
+    publishEditorModalShow () {
+      console.log(this.$store.state.isLogin)
     },
     test (i) {
       this.publish.zawazawaContentImage.splice(i, 1) // 结果arr=['a','c','d']（下标1开始，删除1个）
