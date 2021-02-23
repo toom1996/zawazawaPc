@@ -5,3 +5,6 @@ export function getGithubAOuthInfo (data) { return post('/api/v1/user/auth/githu
 
 // 短信验证码登陆接口
 export function register (data) { return post('/api/v1/user/register', data) }
+
+// 发送短信验证码接口
+export function smsSend (data) { return post('/api/v1/user/sms-send', data) }
