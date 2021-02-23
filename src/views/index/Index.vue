@@ -99,19 +99,27 @@
           </div>
         </div>
       </div>
-      <div class="col col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
+      <div class="col col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12" v-if="!this.$store.state.isLogin">
         <div class="zawazawa-center-block mb-1">
           <div class="login-wrapper p-4">
             <p class="l-login_header">账号登录</p>
             <div>
               <b-form-input
+                @focus="test"
                 class="mb-2"
                 id="input-1"
                 type="email"
                 v-model="login.mobile"
+                :state="checkMobile"
+                :disabled="isSendSms"
+                trim
                 placeholder="手机号"
+                aria-describedby="input-live-help input-live-feedback"
                 required
               ></b-form-input>
+              <b-form-invalid-feedback id="input-live-feedback">
+                请输入正确的手机号码
+              </b-form-invalid-feedback>
               <div class="dm-form-item undefined">
                 <div class="dm-row">
                   <div class="dm-col-24 dm-form-item-field">
@@ -129,6 +137,7 @@
                                 size="sm"
                                 text="Button"
                                 variant="success"
+                                :disabled="isSendSms"
                                 >发送验证码 {{smsTimer == 0 ? '': '(' + smsTimer + ')'}}</b-button
                               >
                             </b-input-group-append>
@@ -259,7 +268,7 @@
       This is the content of the toast. It is short and to the point.
     </b-toast>
     <div class="float-button">
-      <a href="javascript:void(0);" v-b-modal.zawazawa-publish-modal
+      <a href="javascript:void(0);" @click="showPublishModal"
         ><b-avatar icon="plus" v-b-tooltip.hover.top="'发!'"></b-avatar
       ></a>
     </div>
@@ -288,14 +297,61 @@ export default {
         code: ''
       },
       file: [], // 上传文件对象
-      smsTimer: 0
+      smsTimer: 0, // 短信验证码计时器
+      isSendSms: false // 发送短信按钮禁止状态
     }
   },
   methods: {
+
+    // 显示发布modal
+    showPublishModal () {
+      if (!this.$store.state.isLogin) {
+        this.$bvToast.toast('请先登录', {
+            toaster: 'b-toaster-bottom-center',
+            autoHideDelay: 3000,
+            variant: 'warning',
+            appendToast: false
+          })
+          return false
+      }
+      this.$bvModal.show('zawazawa-publish-modal')
+    },
+
+    // 验证手机号码是否正确
+    validateMobile (e) {
+      if (
+        !/^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/.test(
+          this.login.mobile
+        )
+      ) {
+        return false
+      }
+      return true
+    },
     // 发送短信处理函数
     smsSendHandle () {
+      // 验证是否填写了手机号码
+      if ( !this.validateMobile(this.login.mobile) ) {
+        this.$bvToast.toast('请输入正确的手机号码', {
+            toaster: 'b-toaster-top-center',
+            autoHideDelay: 3000,
+            variant: 'warning',
+            appendToast: false
+          })
+          return false
+      }
+      
+      this.smsTimer = 10
+      this.isSendSms = true
       // if (this.login.mobile)
-      this.smsTimer = 60
+      this.timerHandle = setInterval(() => {
+        this.smsTimer--;
+        if (this.smsTimer === 0) {
+          this.isSendSms = false;
+          this.smsTimer = 0;
+          clearInterval(this.timerHandle);
+        }
+      }, 1000);
       smsSend({
         mobile: this.login.mobile
       }).then((e) => {
@@ -305,11 +361,14 @@ export default {
 
     // 登陆处理函数
     registerHandle () {
-      this.smsTimer = 60
       this.$store.commit('setIsLoginingHandle', true)
       register(this.login).then((res) => {
         this.$store.commit('setuserInfo', res.data)
         this.$store.commit('setIsLoginingHandle', false)
+        this.$bvToast.toast('欢迎回来:' + res.data.username, {
+          solid: true
+        })
+        
       }).catch((e) => {
         this.$store.commit('setIsLoginingHandle', false)
       })
@@ -429,6 +488,15 @@ export default {
       }
     },
     publishEditorModalShow () {
+      if (!this.$store.state.isLogin) {
+        this.$bvToast.toast('请先登录', {
+            toaster: 'b-toaster-bottom-center',
+            autoHideDelay: 3000,
+            variant: 'warning',
+            appendToast: false
+          })
+          return false
+      }
       console.log(this.$store.state.isLogin)
     },
     test (i) {
@@ -455,6 +523,13 @@ export default {
     }
   },
   computed: {
+    // 检查是否是正确的手机号码
+    checkMobile () {
+      if (this.login.mobile === '') {
+        return null
+      }
+      return this.validateMobile(this.login.mobile)
+    },
     popoverConfig () {
       // Both title and content specified as a function in this example
       // and will be called the each time the popover is opened
