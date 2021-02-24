@@ -1,9 +1,12 @@
 import axios from 'axios'
 import Vue from 'vue'
 import qs from 'qs'
+import store from '@/store'
+import { refreshToken } from '@/api/user.js'
 
 const v = new Vue()
-// console.log(store.state.count)
+const state = store.state
+var isRefreshing = false
 // create an axios instance
 axios.defaults.timeout = 60000
 axios.defaults.baseURL = process.env.VUE_APP_API
@@ -14,7 +17,8 @@ axios.interceptors.request.use(
     // do something before request is sent
 
     config.headers = {
-      'Content-Type': 'application/x-www-form-urlencoded' // 设置跨域头部
+      'Content-Type': 'application/x-www-form-urlencoded', // 设置跨域头部
+      Authorization: state.zUser.token
     }
 
     // const token = store.state.count
@@ -45,9 +49,34 @@ axios.interceptors.response.use(
    */
   (response) => {
     const res = response.data
+    // 做token刷新
+
+    const t = Math.round(new Date().getTime() / 1000).toString()
+    // 超过生存时间
+    if (t - state.zUser.issuing_time >= 1 && isRefreshing === false) {
+      console.log('超时拉')
+      isRefreshing = true
+      refreshToken({
+        refresh_token: state.zUser.refresh_token
+      }).then((e) => {
+        isRefreshing = false
+        store.commit('setToken', e.data)
+      }).catch((e) => {
+        isRefreshing = false
+        console.log(111111111)
+      })
+    }
+
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200) {
       if (res.code === 401) {
+        // window.location = 'http://www.baidu.com'
+        // v.$bvToast.toast('登陆信息过期', {
+        //   toaster: 'b-toaster-top-center',
+        //   autoHideDelay: 3000,
+        //   variant: 'warning',
+        //   appendToast: false
+        // })
         // 登录过期
         // MessageBox.confirm(
         //   'You have been logged out, you can cancel to stay on this page, or log in again',
@@ -73,7 +102,7 @@ axios.interceptors.response.use(
         variant: 'warning',
         appendToast: false
       })
-      return Promise.reject(new Error(res.msg || '服务器异常'))
+      // return Promise.reject(new Error(''))
     }
     return response
   },

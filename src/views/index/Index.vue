@@ -138,6 +138,7 @@
                                 text="Button"
                                 variant="success"
                                 :disabled="isSendSms"
+                                aria-autocomplete="off"
                                 >发送验证码 {{smsTimer == 0 ? '': '(' + smsTimer + ')'}}</b-button
                               >
                             </b-input-group-append>
@@ -242,7 +243,7 @@
               class="float-right"
               pill
               variant="primary"
-              @click="test()"
+              @click="published()"
             >
               发布
             </b-button>
@@ -275,7 +276,7 @@
   </div>
 </template>
 <script>
-import { getGithubAOuthInfo, register, smsSend } from '@/api/user.js'
+import { getGithubAOuthInfo, register, smsSend, getQiniuToken } from '@/api/user.js'
 import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
@@ -302,17 +303,22 @@ export default {
     }
   },
   methods: {
+    published () {
+      // 申请七牛云上传token
+      getQiniuToken().then((e) => {
+        console.log(e)
+      })
+    },
 
     // 显示发布modal
     showPublishModal () {
       if (!this.$store.state.isLogin) {
         this.$bvToast.toast('请先登录', {
-            toaster: 'b-toaster-bottom-center',
-            autoHideDelay: 3000,
-            variant: 'warning',
-            appendToast: false
-          })
-          return false
+          autoHideDelay: 2000,
+          variant: 'warning',
+          appendToast: false
+        })
+        return false
       }
       this.$bvModal.show('zawazawa-publish-modal')
     },
@@ -331,44 +337,66 @@ export default {
     // 发送短信处理函数
     smsSendHandle () {
       // 验证是否填写了手机号码
-      if ( !this.validateMobile(this.login.mobile) ) {
+      if (!this.validateMobile(this.login.mobile)) {
         this.$bvToast.toast('请输入正确的手机号码', {
-            toaster: 'b-toaster-top-center',
-            autoHideDelay: 3000,
-            variant: 'warning',
-            appendToast: false
-          })
-          return false
+          autoHideDelay: 2000,
+          variant: 'warning',
+          appendToast: false
+        })
+        return false
       }
-      
+
       this.smsTimer = 10
       this.isSendSms = true
       // if (this.login.mobile)
       this.timerHandle = setInterval(() => {
-        this.smsTimer--;
+        this.smsTimer--
         if (this.smsTimer === 0) {
-          this.isSendSms = false;
-          this.smsTimer = 0;
-          clearInterval(this.timerHandle);
+          this.isSendSms = false
+          this.smsTimer = 0
+          clearInterval(this.timerHandle)
         }
-      }, 1000);
+      }, 1000)
       smsSend({
         mobile: this.login.mobile
       }).then((e) => {
-        console.log(e)
+        this.$bvToast.toast(e.msg, {
+          autoHideDelay: 2000,
+          appendToast: false
+        })
       })
     },
 
     // 登陆处理函数
     registerHandle () {
-      this.$store.commit('setIsLoginingHandle', true)
-      register(this.login).then((res) => {
-        this.$store.commit('setuserInfo', res.data)
-        this.$store.commit('setIsLoginingHandle', false)
-        this.$bvToast.toast('欢迎回来:' + res.data.username, {
+      if (!this.validateMobile(this.login.mobile)) {
+        this.$bvToast.toast('请输入正确的手机号码', {
+          autoHideDelay: 2000,
+          variant: 'warning',
+          appendToast: false
+        })
+        return false
+      }
+
+      if (this.login.code === '' || this.login.code.length < 6) {
+        this.$bvToast.toast('请填写正确的6位数验证码', {
+          autoHideDelay: 2000,
+          variant: 'warning',
           solid: true
         })
-        
+        return false
+      }
+
+      this.$store.commit('setIsLoginingHandle', true)
+      register(this.login).then((res) => {
+        if (res.code === 200) {
+          this.$store.commit('setuserInfo', res.data)
+          this.$bvToast.toast('欢迎回来:' + res.data.username, {
+            autoHideDelay: 2000,
+            solid: true
+          })
+        }
+        this.$store.commit('setIsLoginingHandle', false)
       }).catch((e) => {
         this.$store.commit('setIsLoginingHandle', false)
       })
@@ -379,7 +407,6 @@ export default {
         const file = e.target.files[i]
         if (this.publish.zawazawaContentImage.length > 3) {
           this.$bvToast.toast('最多只能上传4张图片', {
-            toaster: 'b-toaster-bottom-center',
             autoHideDelay: 3000,
             variant: 'warning',
             appendToast: false
@@ -490,12 +517,11 @@ export default {
     publishEditorModalShow () {
       if (!this.$store.state.isLogin) {
         this.$bvToast.toast('请先登录', {
-            toaster: 'b-toaster-bottom-center',
-            autoHideDelay: 3000,
-            variant: 'warning',
-            appendToast: false
-          })
-          return false
+          autoHideDelay: 2000,
+          solid: true,
+          variant: 'warning'
+        })
+        return false
       }
       console.log(this.$store.state.isLogin)
     },
