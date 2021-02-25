@@ -19,6 +19,7 @@ axios.interceptors.request.use(
     config.headers = {
       'Content-Type': 'application/x-www-form-urlencoded', // 设置跨域头部
       Authorization: state.zUser.token
+      // Authorization: state.zUser.token
     }
 
     // const token = store.state.count
@@ -69,7 +70,11 @@ axios.interceptors.response.use(
 
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 200) {
+      // 401 退出登陆
       if (res.code === 401) {
+        store.commit('setuserInfo', '')
+        localStorage.removeItem('zUser')
+
         // window.location = 'http://www.baidu.com'
         // v.$bvToast.toast('登陆信息过期', {
         //   toaster: 'b-toaster-top-center',

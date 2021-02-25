@@ -252,6 +252,30 @@
         </div>
       </template>
     </b-modal>
+    <b-overlay :show="show" rounded="sm" @shown="onShown" @hidden="onHidden">
+      <b-card title="Card with custom overlay content" :aria-hidden="show ? 'true' : null">
+        <b-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</b-card-text>
+        <b-card-text>Click the button to toggle the overlay:</b-card-text>
+        <b-button ref="show" :disabled="show" variant="primary" @click="show = true">
+          Show overlay
+        </b-button>
+      </b-card>
+      <template #overlay>
+        <div class="text-center">
+          <b-icon icon="stopwatch" font-scale="3" animation="cylon"></b-icon>
+          <p id="cancel-label">Please wait...</p>
+          <b-button
+            ref="cancel"
+            variant="outline-danger"
+            size="sm"
+            aria-describedby="cancel-label"
+            @click="show = false"
+          >
+            Cancel
+          </b-button>
+        </div>
+      </template>
+    </b-overlay>
     <b-toast id="my-toast" variant="warning" solid>
       <template #toast-title>
         <div class="d-flex flex-grow-1 align-items-baseline">
@@ -277,6 +301,7 @@
 </template>
 <script>
 import { getGithubAOuthInfo, register, smsSend, getQiniuToken } from '@/api/user.js'
+import axios from 'axios'
 import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
@@ -299,14 +324,53 @@ export default {
       },
       file: [], // 上传文件对象
       smsTimer: 0, // 短信验证码计时器
-      isSendSms: false // 发送短信按钮禁止状态
+      isSendSms: false, // 发送短信按钮禁止状态
+      show: false
     }
   },
   methods: {
+    onShown () {
+      // Focus the cancel button when the overlay is showing
+      this.$refs.cancel.focus()
+    },
+    onHidden () {
+      // Focus the show button when the overlay is removed
+      this.$refs.show.focus()
+    },
     published () {
       // 申请七牛云上传token
       getQiniuToken().then((e) => {
-        console.log(e)
+        for (let i = 0; i < this.$refs.inputer.files.length; i++) {
+          // 文件名
+          const timeStamp = new Date().getTime()
+          const key = this.$refs.inputer.files[i].name + '_' + timeStamp + '_' + Math.random(100000, 999999)
+          // var image = new FormData()
+          // image.append('avatar', this.$refs.inputer.files[0])
+          console.log(key)
+
+          const axiosInstance = axios.create({ withCredentials: false }) // withCredentials 禁止携带cookie，带cookie在七牛上有可能出现跨域问题
+          const data = new FormData()
+          data.append('token', e.data) // 七牛需要的token，叫后台给，是七牛账号密码等组成的hash
+          data.append('key', key)
+          data.append('file', this.$refs.inputer.files[i])
+          axiosInstance({
+            method: 'POST',
+            url: 'http://up-z1.qiniup.com/', // 上传地址
+            data: data,
+            timeout: 30000, // 超时时间，因为图片上传有可能需要很久
+            onUploadProgress: (progressEvent) => {
+              // imgLoadPercent 是上传进度，可以用来添加进度条
+              console.log(Math.round(progressEvent.loaded * 100 / progressEvent.total))
+            }
+          }).then(data => {
+            console.log(data)
+            document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
+            // 上传成功...  (登录七牛账号，找到七牛给你的 URL地址) 和 data里面的key 拼接成图片下载地址
+          }).catch(function (err) {
+            console.log(err)
+            // 上传失败
+          })
+        }
       })
     },
 
