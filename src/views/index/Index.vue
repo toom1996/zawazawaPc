@@ -99,83 +99,13 @@
           </div>
         </div>
       </div>
-      <div class="col col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12" v-if="!this.$store.state.isLogin">
-        <div class="zawazawa-center-block mb-1">
-          <div class="login-wrapper p-4">
-            <p class="l-login_header">账号登录</p>
-            <div>
-              <b-form-input
-                @focus="test"
-                class="mb-2"
-                id="input-1"
-                type="email"
-                v-model="login.mobile"
-                :state="checkMobile"
-                :disabled="isSendSms"
-                trim
-                placeholder="手机号"
-                aria-describedby="input-live-help input-live-feedback"
-                required
-              ></b-form-input>
-              <b-form-invalid-feedback id="input-live-feedback">
-                请输入正确的手机号码
-              </b-form-invalid-feedback>
-              <div class="dm-form-item undefined">
-                <div class="dm-row">
-                  <div class="dm-col-24 dm-form-item-field">
-                    <div class="dm-form-item-control">
-                      <span class="dm-form-item-children"
-                        ><span class="dm-input-wrapper"
-                          ><b-input-group class="mb-3">
-                            <b-form-input
-                              placeholder="短信验证码"
-                              v-model="login.code"
-                            ></b-form-input>
-                            <b-input-group-append>
-                              <b-button
-                                @click="smsSendHandle()"
-                                size="sm"
-                                text="Button"
-                                variant="success"
-                                :disabled="isSendSms"
-                                aria-autocomplete="off"
-                                >发送验证码 {{smsTimer == 0 ? '': '(' + smsTimer + ')'}}</b-button
-                              >
-                            </b-input-group-append>
-                          </b-input-group>
-                        </span></span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <b-overlay :show="this.$store.state.isLogining" rounded opacity="0.6"
-              ><b-button block variant="primary" @click="registerHandle()"
-                >登陆</b-button
-              ></b-overlay
-            >
-
-            <div class="row m-2">
-              <div class="col-sm-4 auth-block">
-                <i class="fa fa-wechat"></i><span class="col-sm4">微信</span>
-              </div>
-              <div class="col-sm-4 auth-block">
-                <i class="fa fa-weibo"></i><span class="col-sm4">微博</span>
-              </div>
-              <div class="col-sm-4 auth-block">
-                <i class="fa fa-qq"></i><span class="col-sm4">QQ</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
     <b-modal
       size="lg"
       id="zawazawa-publish-modal"
       @shown="focusPublishEditorHandle"
       @show="publishEditorModalShow"
+      :no-close-on-backdrop="true"
     >
       <div class="zawazawa-publish-container-block">
         <div class="row">
@@ -239,68 +169,45 @@
               multiple
               accept="image/png,image/jpeg,image/gif,image/jpg"
             />
-            <b-button
-              class="float-right"
-              pill
-              variant="primary"
-              @click="published()"
+            <b-overlay
+              :show="isPublishing"
+              rounded
+              opacity="0.6"
+              spinner-small
+              spinner-variant="primary"
+              class="d-inline-block float-right"
             >
-              发布
-            </b-button>
+              <b-button
+                pill
+                variant="primary"
+                @click="published()"
+                :disabled="isPublishing"
+              >
+                发布
+              </b-button>
+            </b-overlay>
             {{ publish.zawazawaContentLength }} / 255
           </div>
         </div>
       </template>
     </b-modal>
-    <b-overlay :show="show" rounded="sm" @shown="onShown" @hidden="onHidden">
-      <b-card title="Card with custom overlay content" :aria-hidden="show ? 'true' : null">
-        <b-card-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</b-card-text>
-        <b-card-text>Click the button to toggle the overlay:</b-card-text>
-        <b-button ref="show" :disabled="show" variant="primary" @click="show = true">
-          Show overlay
-        </b-button>
-      </b-card>
-      <template #overlay>
-        <div class="text-center">
-          <b-icon icon="stopwatch" font-scale="3" animation="cylon"></b-icon>
-          <p id="cancel-label">Please wait...</p>
-          <b-button
-            ref="cancel"
-            variant="outline-danger"
-            size="sm"
-            aria-describedby="cancel-label"
-            @click="show = false"
-          >
-            Cancel
-          </b-button>
-        </div>
-      </template>
-    </b-overlay>
-    <b-toast id="my-toast" variant="warning" solid>
-      <template #toast-title>
-        <div class="d-flex flex-grow-1 align-items-baseline">
-          <b-img
-            blank
-            blank-color="#ff5555"
-            class="mr-2"
-            width="12"
-            height="12"
-          ></b-img>
-          <strong class="mr-auto">Notice!</strong>
-          <small class="text-muted mr-2">42 seconds ago</small>
-        </div>
-      </template>
-      This is the content of the toast. It is short and to the point.
-    </b-toast>
     <div class="float-button">
       <a href="javascript:void(0);" @click="showPublishModal"
         ><b-avatar icon="plus" v-b-tooltip.hover.top="'发!'"></b-avatar
       ></a>
     </div>
+    <b-toast id="my-toast" variant="info" solid :no-auto-hide="true">
+      <p class="text-left mb-0">
+        <span aria-hidden="true" class="spinner-grow spinner-grow-sm"
+          ></span
+        >
+        {{ this.uploadProcessingMessage }}
+      </p>
+    </b-toast>
   </div>
 </template>
 <script>
-import { getGithubAOuthInfo, register, smsSend, getQiniuToken } from '@/api/user.js'
+import { getQiniuToken } from '@/api/user.js'
 import axios from 'axios'
 import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
@@ -325,46 +232,59 @@ export default {
       file: [], // 上传文件对象
       smsTimer: 0, // 短信验证码计时器
       isSendSms: false, // 发送短信按钮禁止状态
-      show: false
+      show: false,
+      isPublishing: false,
+      uploadProcessingMessage: ''
     }
   },
   methods: {
-    onShown () {
-      // Focus the cancel button when the overlay is showing
-      this.$refs.cancel.focus()
-    },
-    onHidden () {
-      // Focus the show button when the overlay is removed
-      this.$refs.show.focus()
-    },
     published () {
+      this.$bvToast.show('my-toast')
+      this.isPublishing = true
+      const url = 'http://up-z1.qiniup.com/'
+
+      this.uploadProcessingMessage = '正在申请token'
       // 申请七牛云上传token
       getQiniuToken().then((e) => {
+        const uploadLength = this.$refs.inputer.files.length
+        const totalProcess = uploadLength * 100
+        const uploadProcess = []
+        let t = 0
         for (let i = 0; i < this.$refs.inputer.files.length; i++) {
           // 文件名
           const timeStamp = new Date().getTime()
           const key = this.$refs.inputer.files[i].name + '_' + timeStamp + '_' + Math.random(100000, 999999)
-          // var image = new FormData()
-          // image.append('avatar', this.$refs.inputer.files[0])
-          console.log(key)
 
           const axiosInstance = axios.create({ withCredentials: false }) // withCredentials 禁止携带cookie，带cookie在七牛上有可能出现跨域问题
+
           const data = new FormData()
           data.append('token', e.data) // 七牛需要的token，叫后台给，是七牛账号密码等组成的hash
           data.append('key', key)
           data.append('file', this.$refs.inputer.files[i])
           axiosInstance({
             method: 'POST',
-            url: 'http://up-z1.qiniup.com/', // 上传地址
+            url: url, // 上传地址
             data: data,
             timeout: 30000, // 超时时间，因为图片上传有可能需要很久
             onUploadProgress: (progressEvent) => {
               // imgLoadPercent 是上传进度，可以用来添加进度条
-              console.log(Math.round(progressEvent.loaded * 100 / progressEvent.total))
+
+              uploadProcess[i] = Math.round(progressEvent.loaded * 100 / progressEvent.total) / 100
+              // console.log(uploadProcess)
+              // console.log(progressEvent)
+              const process = uploadProcess / totalProcess
+
+              uploadProcess.forEach((e) => {
+                t = e
+              })
+              console.log(t)
+
+              this.uploadProcessingMessage = '正在上传图片' + process + '%'
+              // console.log(Math.round(progressEvent.loaded * 100 / progressEvent.total))
             }
           }).then(data => {
             console.log(data)
-            document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
+            // document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
             // 上传成功...  (登录七牛账号，找到七牛给你的 URL地址) 和 data里面的key 拼接成图片下载地址
           }).catch(function (err) {
             console.log(err)
@@ -372,6 +292,8 @@ export default {
           })
         }
       })
+
+      this.isPublishing = false
     },
 
     // 显示发布modal
@@ -387,84 +309,6 @@ export default {
       this.$bvModal.show('zawazawa-publish-modal')
     },
 
-    // 验证手机号码是否正确
-    validateMobile (e) {
-      if (
-        !/^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/.test(
-          this.login.mobile
-        )
-      ) {
-        return false
-      }
-      return true
-    },
-    // 发送短信处理函数
-    smsSendHandle () {
-      // 验证是否填写了手机号码
-      if (!this.validateMobile(this.login.mobile)) {
-        this.$bvToast.toast('请输入正确的手机号码', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          appendToast: false
-        })
-        return false
-      }
-
-      this.smsTimer = 10
-      this.isSendSms = true
-      // if (this.login.mobile)
-      this.timerHandle = setInterval(() => {
-        this.smsTimer--
-        if (this.smsTimer === 0) {
-          this.isSendSms = false
-          this.smsTimer = 0
-          clearInterval(this.timerHandle)
-        }
-      }, 1000)
-      smsSend({
-        mobile: this.login.mobile
-      }).then((e) => {
-        this.$bvToast.toast(e.msg, {
-          autoHideDelay: 2000,
-          appendToast: false
-        })
-      })
-    },
-
-    // 登陆处理函数
-    registerHandle () {
-      if (!this.validateMobile(this.login.mobile)) {
-        this.$bvToast.toast('请输入正确的手机号码', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          appendToast: false
-        })
-        return false
-      }
-
-      if (this.login.code === '' || this.login.code.length < 6) {
-        this.$bvToast.toast('请填写正确的6位数验证码', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          solid: true
-        })
-        return false
-      }
-
-      this.$store.commit('setIsLoginingHandle', true)
-      register(this.login).then((res) => {
-        if (res.code === 200) {
-          this.$store.commit('setuserInfo', res.data)
-          this.$bvToast.toast('欢迎回来:' + res.data.username, {
-            autoHideDelay: 2000,
-            solid: true
-          })
-        }
-        this.$store.commit('setIsLoginingHandle', false)
-      }).catch((e) => {
-        this.$store.commit('setIsLoginingHandle', false)
-      })
-    },
     addImg (e) {
       console.log(e)
       for (let i = 0; i < e.target.files.length; i++) {
@@ -487,10 +331,12 @@ export default {
         })
       }
     },
+
     // 打开上传图片按钮
     openFileModal () {
       document.getElementById('file').click()
     },
+
     // 获得输入框中字符长度
     getLength (val) {
       console.log(val)
@@ -510,6 +356,7 @@ export default {
       }
       return estring(val) // 4
     },
+
     // 内容改变事件
     changeText (e) {
       console.log(e)
@@ -535,6 +382,7 @@ export default {
       this.publish.zawazawaContent = e.target.innerText
       this.publish.zawazawaContentLength = this.getLength(e.target.innerText)
     },
+
     // 游标粘贴
     insertAtCursor (content) {
       var sel, range
@@ -567,6 +415,7 @@ export default {
         }
       }
     },
+
     // modal触发焦点
     focusPublishEditorHandle () {
       // TODO: 登陆权限的验证
@@ -578,6 +427,7 @@ export default {
         this.$refs.textarea.focus()
       }
     },
+
     publishEditorModalShow () {
       if (!this.$store.state.isLogin) {
         this.$bvToast.toast('请先登录', {
@@ -589,36 +439,17 @@ export default {
       }
       console.log(this.$store.state.isLogin)
     },
+
     test (i) {
       this.publish.zawazawaContentImage.splice(i, 1) // 结果arr=['a','c','d']（下标1开始，删除1个）
       console.log(this.file)
     }
   },
-  created () {
-    const queryParam = this.$route.query
-    const loginState = sessionData('get', 'login')
-
-    if (loginState === 'true') {
-      this.$store.commit('setIsLoginingHandle', true)
-      sessionData('clean', 'login')
-      getGithubAOuthInfo(queryParam)
-        .then((res) => {
-          console.log(res)
-          this.$store.commit('setuserInfo', res.data)
-          this.$store.commit('setIsLoginingHandle', false)
-        })
-        .catch(() => {
-          this.$store.commit('setIsLoginingHandle', false)
-        })
-    }
-  },
+  created () {},
   computed: {
-    // 检查是否是正确的手机号码
-    checkMobile () {
-      if (this.login.mobile === '') {
-        return null
-      }
-      return this.validateMobile(this.login.mobile)
+    test1 () {
+      console.log(this.publishProcessing)
+      return this.uploadProcessing
     },
     popoverConfig () {
       // Both title and content specified as a function in this example

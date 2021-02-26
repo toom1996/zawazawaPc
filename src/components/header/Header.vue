@@ -14,19 +14,11 @@
     </button>
     <ul class="navbar-nav px-3">
       <li class="nav-item text-nowrap">
-        <div
-          class="spinner-border spinner-border-sm text-light"
-          role="status"
-          v-if="this.$store.state.isLogining"
-        >
-          <span class="sr-only">Loading...</span>
-        </div>
         <a
-          href="#"
-          @click="loginByGithub"
+          @click="loginHandle"
           class="text-light"
-          v-if="!this.$store.state.zUser.username && this.$store.state.isLogining === false"
-          ><i class="fa fa-github"></i><span class="pl-1">登陆</span></a
+          v-if="!this.$store.state.isLogin"
+          ><span class="pl-1">登陆</span></a
         >
         <div v-if="this.$store.state.zUser.username">
           <b-dropdown
@@ -49,10 +41,9 @@
   </nav>
 </template>
 <script>
-import { getUniqueId, sessionData } from '@/utils/common.js'
 export default {
   mounted () {
-    console.log(this.$store.state.zUser)
+    console.log(this.$store.state)
   },
   computed: {
     // 用户名
@@ -69,12 +60,8 @@ export default {
     }
   },
   methods: {
-    loginByGithub () {
-      sessionData('set', 'login', true)
-      window.location.href =
-        'https://github.com/login/oauth/authorize?client_id=ced388331bf999f80fa8&state=' +
-        getUniqueId() +
-        new Date().getTime()
+    loginHandle () {
+      this.$router.push({ path: '/login' })
     },
     logout () {
       this.$store.commit('setuserInfo', '')

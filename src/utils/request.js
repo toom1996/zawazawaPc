@@ -3,6 +3,7 @@ import Vue from 'vue'
 import qs from 'qs'
 import store from '@/store'
 import { refreshToken } from '@/api/user.js'
+import router from '../router'
 
 const v = new Vue()
 const state = store.state
@@ -10,7 +11,6 @@ var isRefreshing = false
 // create an axios instance
 axios.defaults.timeout = 60000
 axios.defaults.baseURL = process.env.VUE_APP_API
-
 // request interceptor
 axios.interceptors.request.use(
   (config) => {
@@ -74,7 +74,8 @@ axios.interceptors.response.use(
       if (res.code === 401) {
         store.commit('setuserInfo', '')
         localStorage.removeItem('zUser')
-
+        // 跳转到登陆页面
+        router.push({ path: '/login' })
         // window.location = 'http://www.baidu.com'
         // v.$bvToast.toast('登陆信息过期', {
         //   toaster: 'b-toaster-top-center',
