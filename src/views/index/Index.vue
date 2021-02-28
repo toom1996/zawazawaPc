@@ -105,12 +105,12 @@
       id="zawazawa-publish-modal"
       @shown="focusPublishEditorHandle"
       @show="publishEditorModalShow"
-      :no-close-on-backdrop="true"
+      :no-close-on-backdrop="isPublishing"
     >
       <div class="zawazawa-publish-container-block">
         <div class="row">
           <div class="col-md-2">
-            <b-avatar icon="plus"></b-avatar>
+            <b-avatar variant="primary" badge-variant="danger" size="lg" :src="this.$store.state.zUser.avatar"></b-avatar>
           </div>
           <div class="col-md-10">
             <p
@@ -196,7 +196,7 @@
         ><b-avatar icon="plus" v-b-tooltip.hover.top="'发!'"></b-avatar
       ></a>
     </div>
-    <b-toast id="my-toast" variant="info" solid :no-auto-hide="true">
+    <b-toast id="uploading-toast" variant="info" solid :no-auto-hide="true">
       <p class="text-left mb-0">
         <span aria-hidden="true" class="spinner-grow spinner-grow-sm"
           ></span
@@ -208,8 +208,8 @@
 </template>
 <script>
 import { getQiniuToken } from '@/api/user.js'
+import { publishPost } from '@/api/post.js'
 import axios from 'axios'
-import { sessionData } from '@/utils/common.js'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
 export default {
@@ -221,68 +221,77 @@ export default {
   data: function () {
     return {
       publish: {
-        zawazawaContent: '',
-        zawazawaContentLength: 0,
-        zawazawaContentImage: []
+        zawazawaContent: '', //发布的内容
+        zawazawaContentLength: 0, //发布内容的长度
+        zawazawaContentImage: [] // 发布的图片
       },
-      login: {
-        mobile: '',
-        code: ''
-      },
-      file: [], // 上传文件对象
-      smsTimer: 0, // 短信验证码计时器
-      isSendSms: false, // 发送短信按钮禁止状态
-      show: false,
-      isPublishing: false,
-      uploadProcessingMessage: ''
+      isPublishing: false, // 是否为发布中状态
+      uploadProcessingMessage: '' // 发布中状态toast提示信息
     }
   },
   methods: {
+    // 发布新内容
     published () {
-      this.$bvToast.show('my-toast')
+      console.log(this.publish.zawazawaContentImage)
+      this.$bvToast.show('uploading-toast')
       this.isPublishing = true
       const url = 'http://up-z1.qiniup.com/'
 
       this.uploadProcessingMessage = '正在申请token'
       // 申请七牛云上传token
       getQiniuToken().then((e) => {
-        const uploadLength = this.$refs.inputer.files.length
-        const totalProcess = uploadLength * 100
+        const fileObj = this.publish.zawazawaContentImage
+        const uploadLength = fileObj.length
+        const totalProcess = uploadLength
         const uploadProcess = []
-        let t = 0
-        for (let i = 0; i < this.$refs.inputer.files.length; i++) {
+        let isComplete = false
+        for (let i = 0; i < uploadLength; i++) {
           // 文件名
           const timeStamp = new Date().getTime()
-          const key = this.$refs.inputer.files[i].name + '_' + timeStamp + '_' + Math.random(100000, 999999)
+          const key = fileObj[i].file.name + '_' + timeStamp + '_' + Math.random(100000, 999999)
 
-          const axiosInstance = axios.create({ withCredentials: false }) // withCredentials 禁止携带cookie，带cookie在七牛上有可能出现跨域问题
+          // withCredentials 禁止携带cookie，带cookie在七牛上有可能出现跨域问题
+          const axiosInstance = axios.create({ withCredentials: false })
 
           const data = new FormData()
           data.append('token', e.data) // 七牛需要的token，叫后台给，是七牛账号密码等组成的hash
           data.append('key', key)
-          data.append('file', this.$refs.inputer.files[i])
+          data.append('file', fileObj[i].file)
           axiosInstance({
             method: 'POST',
             url: url, // 上传地址
             data: data,
             timeout: 30000, // 超时时间，因为图片上传有可能需要很久
             onUploadProgress: (progressEvent) => {
-              // imgLoadPercent 是上传进度，可以用来添加进度条
-
-              uploadProcess[i] = Math.round(progressEvent.loaded * 100 / progressEvent.total) / 100
-              // console.log(uploadProcess)
-              // console.log(progressEvent)
-              const process = uploadProcess / totalProcess
-
+              uploadProcess[i] = Math.round(progressEvent.loaded * 100 / progressEvent.total)
+              let t = 0
               uploadProcess.forEach((e) => {
-                t = e
+                t += e
               })
-              console.log(t)
-
-              this.uploadProcessingMessage = '正在上传图片' + process + '%'
-              // console.log(Math.round(progressEvent.loaded * 100 / progressEvent.total))
+              let process = Math.round(t / totalProcess )
+              console.log(process)
+              if (process === 100) {
+                isComplete = true
+              }
+              this.uploadProcessingMessage = '正在上传图片' + Math.round(t / totalProcess ) + '%'
             }
           }).then(data => {
+            // 如果全部上传完成, 隐藏上传toast
+            if (isComplete === true) {
+              publishPost().then((e) => {
+                console.log(e)
+                this.$bvToast.hide('uploading-toast')
+                this.isPublishing = false
+                // TODO 关闭modal
+                this.$bvModal.hide('zawazawa-publish-modal')
+                // toast 发布成功
+                this.$bvToast.toast('发布成功', {
+                  autoHideDelay: 2000,
+                  solid: true,
+                  variant: 'success'
+                })
+              })
+            }
             console.log(data)
             // document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
             // 上传成功...  (登录七牛账号，找到七牛给你的 URL地址) 和 data里面的key 拼接成图片下载地址
@@ -292,8 +301,6 @@ export default {
           })
         }
       })
-
-      this.isPublishing = false
     },
 
     // 显示发布modal
@@ -315,7 +322,7 @@ export default {
         const file = e.target.files[i]
         if (this.publish.zawazawaContentImage.length > 3) {
           this.$bvToast.toast('最多只能上传4张图片', {
-            autoHideDelay: 3000,
+            autoHideDelay: 2000,
             variant: 'warning',
             appendToast: false
           })
@@ -323,11 +330,16 @@ export default {
         }
         // 上传大小限制 10M
         if (file.size >= 10485760) {
-          alert('请选择10M以内的图片！')
+          this.$bvToast.toast('请选择10M以内的图片！', {
+            autoHideDelay: 2000,
+            variant: 'warning',
+            appendToast: false
+          })
           return false
         }
         this.publish.zawazawaContentImage.push({
-          source: URL.createObjectURL(file)
+          source: URL.createObjectURL(file),
+          file: file
         })
       }
     },
@@ -442,7 +454,6 @@ export default {
 
     test (i) {
       this.publish.zawazawaContentImage.splice(i, 1) // 结果arr=['a','c','d']（下标1开始，删除1个）
-      console.log(this.file)
     }
   },
   created () {},

@@ -1,5 +1,6 @@
 <template>
   <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <img class="mr-3" src="../../static/logo-square.png" alt="" width="48" height="48">
     <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">zawazawa</a>
     <button
       class="navbar-toggler position-absolute d-md-none collapsed"

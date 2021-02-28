@@ -124,6 +124,12 @@
 import { validateMobile } from '@/utils/common.js'
 import { smsSend, register } from '@/api/user.js'
 export default {
+  mounted () {
+    // 如果已经登陆过的用户, 访问此页面将会返回首页
+    if (this.$store.state.isLogin === true) {
+      this.$router.push({ path: '/' })
+    }
+  },
   data () {
     return {
       login: {

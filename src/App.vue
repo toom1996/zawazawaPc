@@ -7,20 +7,14 @@
       <router-link to="/login">Login</router-link> |
     </div>
     <router-view></router-view>
-    <footer class="my-5 pt-5 text-muted text-center text-small" v-if="$route.meta.showFooter == true">
-      <p class="mb-1">© 2017-2020 Company Name</p>
-      <ul class="list-inline">
-        <li class="list-inline-item"><a href="#">Privacy</a></li>
-        <li class="list-inline-item"><a href="#">Terms</a></li>
-        <li class="list-inline-item"><a href="#">Support</a></li>
-      </ul>
-    </footer>
+    <Footer />
   </div>
 </template>
 <script>
 import Header from './components/header/Header.vue'
+import Footer from './components/footer/Footer.vue'
 export default {
-  components: { Header },
+  components: { Header, Footer },
   mounted () {
     console.log('mounted')
   },
