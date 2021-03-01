@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <b-alert show>假的公告</b-alert>
+    <Notify text='假的通知' />
     <div class="row">
       <!-- Main Content -->
       <div class="col col-xl-8 col-lg-8 col-md-8 col-sm-8 col-12">
@@ -31,7 +31,7 @@
               <div class="post-attachment-block">
                 <img
                   class="mr-2"
-                  src="http://toomhub.image.23cm.cn/14993df391fc3c455040e5978e8f85b8.jpg"
+                  src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3368953305,3282153653&fm=26&gp=0.jpg"
                   alt="author"
                 />
                 <img
@@ -192,7 +192,7 @@
       </template>
     </b-modal>
     <div class="float-button">
-      <a href="javascript:void(0);" @click="showPublishModal"
+      <a href="javascript:void(0);" id="float-publish" @click="showPublishModal"
         ><b-avatar icon="plus" v-b-tooltip.hover.top="'发!'"></b-avatar
       ></a>
     </div>
@@ -212,6 +212,7 @@ import { publishPost } from '@/api/post.js'
 import axios from 'axios'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
+
 export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
@@ -221,8 +222,8 @@ export default {
   data: function () {
     return {
       publish: {
-        zawazawaContent: '', //发布的内容
-        zawazawaContentLength: 0, //发布内容的长度
+        zawazawaContent: '', // 发布的内容
+        zawazawaContentLength: 0, // 发布内容的长度
         zawazawaContentImage: [] // 发布的图片
       },
       isPublishing: false, // 是否为发布中状态
@@ -268,12 +269,12 @@ export default {
               uploadProcess.forEach((e) => {
                 t += e
               })
-              let process = Math.round(t / totalProcess )
+              const process = Math.round(t / totalProcess)
               console.log(process)
               if (process === 100) {
                 isComplete = true
               }
-              this.uploadProcessingMessage = '正在上传图片' + Math.round(t / totalProcess ) + '%'
+              this.uploadProcessingMessage = '正在上传图片' + Math.round(t / totalProcess) + '%'
             }
           }).then(data => {
             // 如果全部上传完成, 隐藏上传toast
@@ -306,11 +307,7 @@ export default {
     // 显示发布modal
     showPublishModal () {
       if (!this.$store.state.isLogin) {
-        this.$bvToast.toast('请先登录', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          appendToast: false
-        })
+        this.$toast('请先登陆~')
         return false
       }
       this.$bvModal.show('zawazawa-publish-modal')
@@ -321,7 +318,7 @@ export default {
       for (let i = 0; i < e.target.files.length; i++) {
         const file = e.target.files[i]
         if (this.publish.zawazawaContentImage.length > 3) {
-          this.$bvToast.toast('最多只能上传4张图片', {
+          this.$toast('最多只能上传4张图片', {
             autoHideDelay: 2000,
             variant: 'warning',
             appendToast: false
@@ -330,11 +327,7 @@ export default {
         }
         // 上传大小限制 10M
         if (file.size >= 10485760) {
-          this.$bvToast.toast('请选择10M以内的图片！', {
-            autoHideDelay: 2000,
-            variant: 'warning',
-            appendToast: false
-          })
+          this.$toast('请选择10M以内的图片！')
           return false
         }
         this.publish.zawazawaContentImage.push({
@@ -479,6 +472,9 @@ export default {
 }
 </script>
 <style scoped>
+.container {
+  padding-top: 6rem
+}
 .zawazawa-center-block {
   border-radius: 5px;
 }

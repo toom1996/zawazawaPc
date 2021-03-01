@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <Header v-if="$route.meta.showHeader == true" />
-    <div id="nav" v-if="$route.meta.showHeader == true">
+    <!-- <div id="nav" v-if="$route.meta.showHeader == true">
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
       <router-link to="/login">Login</router-link> |
-    </div>
+    </div> -->
     <router-view></router-view>
     <Footer />
   </div>
@@ -13,6 +13,7 @@
 <script>
 import Header from './components/header/Header.vue'
 import Footer from './components/footer/Footer.vue'
+
 export default {
   components: { Header, Footer },
   mounted () {
@@ -31,8 +32,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  font-size: 14px;
 }
-
 #nav {
   padding: 30px;
 
@@ -47,5 +48,10 @@ export default {
 }
 .toast-header {
   display: none !important;
+}
+
+.Vue-Toastification__toast--default {
+    background-color: #ffffff !important;
+    color: #000000 !important;
 }
 </style>

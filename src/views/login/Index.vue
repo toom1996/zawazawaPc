@@ -145,11 +145,7 @@ export default {
     smsSendHandle () {
       // 验证是否填写了手机号码
       if (!validateMobile(this.login.mobile)) {
-        this.$bvToast.toast('请输入正确的手机号码', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          appendToast: false
-        })
+        this.$toast('请输入正确的手机号码')
         return false
       }
 
@@ -168,30 +164,19 @@ export default {
         mobile: this.login.mobile
       }).then((e) => {
         if (e.code === 200) {
-          this.$bvToast.toast(e.msg, {
-            autoHideDelay: 2000,
-            appendToast: false
-          })
+          this.$toast(e.msg)
         }
       })
     },
     // 登陆处理函数
     registerHandle () {
       if (!validateMobile(this.login.mobile)) {
-        this.$bvToast.toast('请输入正确的手机号码', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          appendToast: false
-        })
+        this.$toast('请输入正确的手机号码')
         return false
       }
 
       if (this.login.code === '' || this.login.code.length < 6) {
-        this.$bvToast.toast('请填写正确的6位数验证码', {
-          autoHideDelay: 2000,
-          variant: 'warning',
-          solid: true
-        })
+        this.$toast('请填写正确的6位数验证码')
         return false
       }
 
@@ -200,10 +185,6 @@ export default {
         if (res.code === 200) {
           this.$store.commit('setuserInfo', res.data)
           this.$router.push({ path: '/' })
-        //   this.$bvToast.toast('欢迎回来:' + res.data.username, {
-        //     autoHideDelay: 2000,
-        //     solid: true
-        //   })
         }
         this.$store.commit('setIsLoginingHandle', false)
       }).catch((e) => {
