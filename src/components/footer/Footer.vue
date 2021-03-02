@@ -105,64 +105,13 @@
                 >
                   <div class="logo">
                     <img
+                      style="width:10rem"
                       itemprop="image"
-                      src="https://s3.amazonaws.com/creativetim_bucket/new_logo.png"
+                      src="../../static/zawazawaWidthLogo.png"
                     />
                   </div>
-                  <span itemprop="name">Creative Tim</span>
                 </a>
                 <br />
-                <a
-                  itemprop="sameAs"
-                  href="https://github.com/creativetimofficial"
-                  class="btn btn-default btn-social btn-round"
-                  rel="publisher"
-                  target="_blank"
-                  ><i class="fa fa-github"></i
-                ></a>
-                <a
-                  itemprop="sameAs"
-                  href="https://dribbble.com/creativetim"
-                  class="btn btn-default btn-social btn-round"
-                  rel="publisher"
-                  target="_blank"
-                  ><i class="fa fa-dribbble"></i
-                ></a>
-                <a
-                  itemprop="sameAs"
-                  href="https://www.facebook.com/CreativeTim"
-                  class="btn btn-default btn-social btn-round"
-                  target="_blank"
-                  ><i class="fa fa-facebook-square"></i
-                ></a>
-                <a
-                  itemprop="sameAs"
-                  href="https://twitter.com/CreativeTim"
-                  class="btn btn-default btn-social btn-round"
-                  target="_blank"
-                  ><i class="fa fa-twitter"></i
-                ></a>
-                <a
-                  itemprop="sameAs"
-                  href="https://www.instagram.com/creativetimofficial/"
-                  class="btn btn-default btn-social btn-round"
-                  target="_blank"
-                  ><i class="fa fa-instagram"></i
-                ></a>
-                <a
-                  itemprop="sameAs"
-                  href="https://www.youtube.com/channel/UCVyTG4sCw-rOvB9oHkzZD1w"
-                  class="btn btn-default btn-social btn-round"
-                  target="_blank"
-                  ><i class="fa fa-youtube"></i
-                ></a>
-                <a
-                  itemprop="sameAs"
-                  href="https://ro.pinterest.com/thecreativetim/"
-                  class="btn btn-default btn-social btn-round"
-                  target="_blank"
-                  ><i class="fa fa-pinterest"></i
-                ></a>
               </div>
             </div>
             <div class="col-md-12">
@@ -183,8 +132,7 @@
 
         </div>
               <div class="credits">
-                © 2021 Creative Tim, all rights reserved. Made with
-                <i class="icon-heart heart" alt="love"></i> for a better web.
+                © 2021 zawazawa
               </div>
             </div>
           </div>

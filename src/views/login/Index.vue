@@ -220,7 +220,7 @@ export default {
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
   align-items: stretch;
-  background: url(../../static/bg-auth.jpg) center;
+  background: url(../../static/test.png) center;
   background-size: cover;
 }
 .auth-fluid .auth-fluid-form-box {
@@ -228,16 +228,7 @@ export default {
   border-radius: 0;
   z-index: 2;
   padding: 3rem 2rem;
-  background-color: #fff;
-  position: relative;
-  width: 100%;
-}
-.auth-fluid .auth-fluid-form-box {
-  max-width: 480px;
-  border-radius: 0;
-  z-index: 2;
-  padding: 3rem 2rem;
-  background-color: #fff;
+  background-color: #1E3247;
   position: relative;
   width: 100%;
 }

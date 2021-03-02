@@ -11,19 +11,29 @@ var isRefreshing = false
 // create an axios instance
 axios.defaults.timeout = 60000
 axios.defaults.baseURL = process.env.VUE_APP_API
+
+// 取消重复请求的接口
+const removeCommonPending = (config) => {
+  for(const k in store.state.axiosPromiseCancel) {
+    if (store.state.axiosPromiseCancel[k].u === config.url + '&' + config.method) {
+      store.commit('clearCommonAxiosPromiseCancel', k)
+    }
+  }
+}
+
 // request interceptor
 axios.interceptors.request.use(
   (config) => {
     // do something before request is sent
-
+    removeCommonPending(config)
     config.headers = {
       'Content-Type': 'application/x-www-form-urlencoded', // 设置跨域头部
       Authorization: state.zUser.token
       // Authorization: state.zUser.token
     }
 
-    config.cancelToken = new axios.CancelToken(cancel => {
-      window.__axiosPromiseArr.push({ cancel })
+    config.cancelToken = new axios.CancelToken((cancel) => {
+      store.commit('setAxiosPromiseCancelArr', { u: config.url + '&' + config.method, f: cancel })
     })
 
     // const token = store.state.count

@@ -4,6 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
+    // 接口请求存放的数组
+    axiosPromiseCancel: [],
     // 登陆中
     isLogining: false,
     zUser: JSON.parse(localStorage.getItem('zUser')) || {},
@@ -37,8 +39,25 @@ export default new Vuex.Store({
       state.zUser = item// 之后才是修改state中的状态
       console.log(state.zUser)
     },
-    addmu (state) { state.count++ },
-    lessmu (state) { state.count-- }
+    // 把请求依次加在数组中
+    setAxiosPromiseCancelArr: (state, cancel) => {
+      state.axiosPromiseCancel.push(cancel)
+    },
+    // 取消数组中的所有请求, 并重置为[]
+    clearAxiosPromiseCancelArr: (state) => {
+      console.log('clearAxiosPromiseCancelArr')
+      if (state.axiosPromiseCancel.length !== 0) {
+        state.axiosPromiseCancel.forEach(e => {
+          e && e.f()
+        })
+        state.axiosPromiseCancel = []
+      }
+    },
+    // 取消数组中所有请求
+    clearCommonAxiosPromiseCancel: (state, index) => {
+      state.axiosPromiseCancel[index].f()
+      state.axiosPromiseCancel.splice(index, 1)
+    }
   },
   actions: {
   },

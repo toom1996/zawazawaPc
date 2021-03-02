@@ -11,16 +11,7 @@ import 'vue-toastification/dist/index.css'
 import HttpCode from './utils/code.js'
 
 import Notify from './components/common/Notify'
-window.__axiosPromiseArr = []
-router.beforeEach((to, from, next) => {
-  console.log(window.__axiosPromiseArr)
-  window.__axiosPromiseArr.forEach((ele, index) => {
-    console.log(ele)
-    ele.cancel()
-    delete window.__axiosPromiseArr[index]
-  })
-  next()
-})
+
 Vue.use(Toast, {
 
   // 显示位置：top-right, top-center, top-left, bottom-right, bottom-center, bottom-left.

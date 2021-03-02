@@ -212,6 +212,7 @@ import { publishPost } from '@/api/post.js'
 import axios from 'axios'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
+import HttpCode from '@/utils/code.js'
 
 export default {
   components: {
@@ -241,7 +242,8 @@ export default {
       this.uploadProcessingMessage = '正在申请token'
       // 申请七牛云上传token
       getQiniuToken().then((e) => {
-        const fileObj = this.publish.zawazawaContentImage
+        if (e.code === HttpCode.SUCCESS) {
+          const fileObj = this.publish.zawazawaContentImage
         const uploadLength = fileObj.length
         const totalProcess = uploadLength
         const uploadProcess = []
@@ -300,6 +302,7 @@ export default {
             console.log(err)
             // 上传失败
           })
+        }
         }
       })
     },
