@@ -1,3 +1,4 @@
+window.__axiosPromiseArr = []
 export function getUniqueId () {
   const n = 1 // 生成一个唯一id，包含数字和字母
   var random = function () {

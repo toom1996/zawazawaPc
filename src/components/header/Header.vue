@@ -25,24 +25,25 @@
         <a class="p-2 text-dark" href="#">Pricing</a>
       </nav>
       <div class="btn-wrapper-2">
-        <div v-if="!this.$store.state.isLogin">
-          <b-button
+        <b-button
           pill
           class="m-1 publish-button"
           style="padding-left: 2rem; padding-right: 2rem"
           @click="showPublishModal"
           >发布</b-button
         >
+
         <b-button
+        v-if="!this.$store.state.isLogin"
           pill
           class="m-1 login-button"
           style="padding-left: 2rem; padding-right: 2rem"
           @click="loginHandle"
           >登陆</b-button
         >
-        </div>
-        <div v-if="this.$store.state.zUser.username">
+
           <b-dropdown
+          v-if="this.$store.state.zUser.username"
             right
             size="sm"
             variant="link"
@@ -61,7 +62,7 @@
             <b-dropdown-item href="#">个人中心</b-dropdown-item>
             <b-dropdown-item href="#" @click="logout()">退出</b-dropdown-item>
           </b-dropdown>
-        </div>
+
       </div>
     </div>
   </div>
@@ -87,6 +88,10 @@ export default {
   },
   methods: {
     showPublishModal () {
+      if (this.$store.state.isLogin === false) {
+        this.$router.push({ path: '/login' })
+        return false
+      }
       document.getElementById('float-publish').click()
       // this.$parent.showPublishModal()
       // const scroll =

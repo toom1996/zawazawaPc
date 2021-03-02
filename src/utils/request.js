@@ -4,7 +4,7 @@ import qs from 'qs'
 import store from '@/store'
 import { refreshToken } from '@/api/user.js'
 import router from '../router'
-
+import HttpCode from '@/utils/code.js'
 const v = new Vue()
 const state = store.state
 var isRefreshing = false
@@ -21,6 +21,10 @@ axios.interceptors.request.use(
       Authorization: state.zUser.token
       // Authorization: state.zUser.token
     }
+
+    config.cancelToken = new axios.CancelToken(cancel => {
+      window.__axiosPromiseArr.push({ cancel })
+    })
 
     // const token = store.state.count
     // config.url = `${config.url}&token=${token}`
@@ -69,13 +73,14 @@ axios.interceptors.response.use(
     }
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 200) {
+    if (res.code !== HttpCode.SUCCESS) {
       // 401 退出登陆
       if (res.code === 401) {
         store.commit('setuserInfo', '')
         localStorage.removeItem('zUser')
         // 跳转到登陆页面
         router.push({ path: '/login' })
+        return false
         // window.location = 'http://www.baidu.com'
         // v.$bvToast.toast('登陆信息过期', {
         //   toaster: 'b-toaster-top-center',

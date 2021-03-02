@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Notify text='假的通知' />
+    <Notify text='点我下载APP' />
     <div class="row">
       <!-- Main Content -->
       <div class="col col-xl-8 col-lg-8 col-md-8 col-sm-8 col-12">
@@ -191,7 +191,7 @@
         </div>
       </template>
     </b-modal>
-    <div class="float-button">
+    <div class="float-button" v-show="false">
       <a href="javascript:void(0);" id="float-publish" @click="showPublishModal"
         ><b-avatar icon="plus" v-b-tooltip.hover.top="'发!'"></b-avatar
       ></a>
@@ -670,5 +670,8 @@ ul {
 }
 .auth-block {
   cursor: pointer;
+}
+/deep/ .modal-content {
+  border-radius: 2.3rem;
 }
 </style>

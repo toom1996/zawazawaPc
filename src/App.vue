@@ -7,7 +7,7 @@
       <router-link to="/login">Login</router-link> |
     </div> -->
     <router-view></router-view>
-    <Footer />
+    <Footer v-if="$route.meta.showFooter == true" />
   </div>
 </template>
 <script>

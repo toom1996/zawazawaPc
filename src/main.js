@@ -8,8 +8,19 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'font-awesome/css/font-awesome.min.css'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import HttpCode from './utils/code.js'
 
 import Notify from './components/common/Notify'
+window.__axiosPromiseArr = []
+router.beforeEach((to, from, next) => {
+  console.log(window.__axiosPromiseArr)
+  window.__axiosPromiseArr.forEach((ele, index) => {
+    console.log(ele)
+    ele.cancel()
+    delete window.__axiosPromiseArr[index]
+  })
+  next()
+})
 Vue.use(Toast, {
 
   // 显示位置：top-right, top-center, top-left, bottom-right, bottom-center, bottom-left.
@@ -68,7 +79,7 @@ Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
 Vue.component('Notify', Notify)
 Vue.config.productionTip = false
-
+Vue.prototype.code = HttpCode
 new Vue({
   router,
   store,
