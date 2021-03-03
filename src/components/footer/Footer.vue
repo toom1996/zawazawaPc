@@ -83,11 +83,12 @@
             </div>
             <div class="col-sm-4 col-xs-12 text-center twitter-news">
               <h4 class="text-white mb-0">公众号</h4>
-              <ul class="list-unstyled" data-turbolinks="false">
-                <li><a href="/terms">Terms &amp; Conditions</a></li>
-                <li><a href="/privacy">Privacy Policy</a></li>
-                <li><a href="/license">EULA</a></li>
-              </ul>
+              <img
+              class="m-4"
+                      style="width:10rem"
+                      itemprop="image"
+                      src="../../static/mp-qrcode.jpg"
+                    />
             </div>
           </div>
           <hr />

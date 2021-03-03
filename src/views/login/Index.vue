@@ -14,9 +14,13 @@
                 /></span>
               </a>
             </div>
-
-            <h4 class="mt-0">欢迎光临!^_^</h4>
-
+            <div class="mb-5">
+              <img
+              style="width:10rem"
+              itemprop="image"
+              src="../../static/zawazawaWidthLogo.png"
+            />
+            </div>
             <div class="form-group">
               <b-form-input
                 class="mb-2"

@@ -14,7 +14,7 @@ axios.defaults.baseURL = process.env.VUE_APP_API
 
 // 取消重复请求的接口
 const removeCommonPending = (config) => {
-  for(const k in store.state.axiosPromiseCancel) {
+  for (const k in store.state.axiosPromiseCancel) {
     if (store.state.axiosPromiseCancel[k].u === config.url + '&' + config.method) {
       store.commit('clearCommonAxiosPromiseCancel', k)
     }
@@ -64,59 +64,16 @@ axios.interceptors.response.use(
    */
   (response) => {
     const res = response.data
-    // 做token刷新
-
-    const t = Math.round(new Date().getTime() / 1000).toString()
-    // 超过生存时间
-    if (t - state.zUser.issuing_time >= 1 && isRefreshing === false) {
-      console.log('超时拉')
-      isRefreshing = true
-      refreshToken({
-        refresh_token: state.zUser.refresh_token
-      }).then((e) => {
-        isRefreshing = false
-        store.commit('setToken', e.data)
-      }).catch((e) => {
-        isRefreshing = false
-        console.log(111111111)
-      })
+    // 401 退出登陆
+    if (res.code === 401) {
+      store.commit('setuserInfo', '')
+      localStorage.removeItem('zUser')
+      // 跳转到登陆页面
+      router.push({ path: '/login' })
     }
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== HttpCode.SUCCESS) {
-      // 401 退出登陆
-      if (res.code === 401) {
-        store.commit('setuserInfo', '')
-        localStorage.removeItem('zUser')
-        // 跳转到登陆页面
-        router.push({ path: '/login' })
-        return false
-        // window.location = 'http://www.baidu.com'
-        // v.$bvToast.toast('登陆信息过期', {
-        //   toaster: 'b-toaster-top-center',
-        //   autoHideDelay: 3000,
-        //   variant: 'warning',
-        //   appendToast: false
-        // })
-        // 登录过期
-        // MessageBox.confirm(
-        //   'You have been logged out, you can cancel to stay on this page, or log in again',
-        //   'Confirm logout',
-        //   {
-        //     confirmButtonText: 'Re-Login',
-        //     cancelButtonText: 'Cancel',
-        //     type: 'warning'
-        //   }
-        // ).then(() => {
-        //   store.dispatch('user/resetToken').then(() => {
-        //     location.reload()
-        //   })
-        // })
-      }
-
-      if (res.code !== 200) {
-        console.log('ljq')
-      }
+    if (res.code !== HttpCode.SUCCESS && res.code !== 401) {
       v.$bvToast.toast(res.msg || '服务器异常', {
         toaster: 'b-toaster-top-center',
         autoHideDelay: 3000,
@@ -125,6 +82,26 @@ axios.interceptors.response.use(
       })
       // return Promise.reject(new Error(''))
     }
+    if (res.code === HttpCode.SUCCESS) {
+      // 刷新token
+      const t = Math.round(new Date().getTime() / 1000).toString()
+      console.log(t - state.zUser.issuing_time)
+      // 超过生存时间
+      if (t - state.zUser.issuing_time >= 3600 && isRefreshing === false) {
+        console.log('超时拉')
+        isRefreshing = true
+        refreshToken({
+          refresh_token: state.zUser.refresh_token
+        }).then((e) => {
+          isRefreshing = false
+          store.commit('setToken', e.data)
+        }).catch((e) => {
+          isRefreshing = false
+          console.log(111111111)
+        })
+      }
+    }
+
     return response
   },
   (error) => {

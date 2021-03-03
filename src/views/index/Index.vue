@@ -36,7 +36,7 @@
                 />
                 <img
                   class="mr-2"
-                  src="http://toomhub.image.23cm.cn/tmp_fd0a16ca8e2d7203d215d1e43d4acd52ecd0fd31ba1b8ead.jpg"
+                  src="https://mmbiz.qpic.cn/mmbiz_gif/ZK1xPdHuks9bGV9mjWhgNTm1fQK0mEVEicUYPtFux5AWonf0ur6EpoibS1qmRFC5tAicufZ31iafdZthicD7Xiakd3tg/640?wx_fmt=gif"
                   alt="author"
                 />
                 <img
@@ -227,6 +227,10 @@ export default {
         zawazawaContentLength: 0, // 发布内容的长度
         zawazawaContentImage: [] // 发布的图片
       },
+      data: {
+        content: '', // 内容
+        attach: [] // 附件
+      },
       isPublishing: false, // 是否为发布中状态
       uploadProcessingMessage: '' // 发布中状态toast提示信息
     }
@@ -244,65 +248,69 @@ export default {
       getQiniuToken().then((e) => {
         if (e.code === HttpCode.SUCCESS) {
           const fileObj = this.publish.zawazawaContentImage
-        const uploadLength = fileObj.length
-        const totalProcess = uploadLength
-        const uploadProcess = []
-        let isComplete = false
-        for (let i = 0; i < uploadLength; i++) {
+          const uploadLength = fileObj.length
+          const totalProcess = uploadLength
+          const uploadProcess = []
+          let isComplete = false
+          for (let i = 0; i < uploadLength; i++) {
           // 文件名
-          const timeStamp = new Date().getTime()
-          const key = fileObj[i].file.name + '_' + timeStamp + '_' + Math.random(100000, 999999)
+            const timeStamp = new Date().getTime()
+            const key = fileObj[i].file.name + '_' + timeStamp + '_' + Math.random(100000, 999999)
 
-          // withCredentials 禁止携带cookie，带cookie在七牛上有可能出现跨域问题
-          const axiosInstance = axios.create({ withCredentials: false })
+            // withCredentials 禁止携带cookie，带cookie在七牛上有可能出现跨域问题
+            const axiosInstance = axios.create({ withCredentials: false })
 
-          const data = new FormData()
-          data.append('token', e.data) // 七牛需要的token，叫后台给，是七牛账号密码等组成的hash
-          data.append('key', key)
-          data.append('file', fileObj[i].file)
-          axiosInstance({
-            method: 'POST',
-            url: url, // 上传地址
-            data: data,
-            timeout: 30000, // 超时时间，因为图片上传有可能需要很久
-            onUploadProgress: (progressEvent) => {
-              uploadProcess[i] = Math.round(progressEvent.loaded * 100 / progressEvent.total)
-              let t = 0
-              uploadProcess.forEach((e) => {
-                t += e
-              })
-              const process = Math.round(t / totalProcess)
-              console.log(process)
-              if (process === 100) {
-                isComplete = true
-              }
-              this.uploadProcessingMessage = '正在上传图片' + Math.round(t / totalProcess) + '%'
-            }
-          }).then(data => {
-            // 如果全部上传完成, 隐藏上传toast
-            if (isComplete === true) {
-              publishPost().then((e) => {
-                console.log(e)
-                this.$bvToast.hide('uploading-toast')
-                this.isPublishing = false
-                // TODO 关闭modal
-                this.$bvModal.hide('zawazawa-publish-modal')
-                // toast 发布成功
-                this.$bvToast.toast('发布成功', {
-                  autoHideDelay: 2000,
-                  solid: true,
-                  variant: 'success'
+            const data = new FormData()
+            data.append('token', e.data) // 七牛需要的token，叫后台给，是七牛账号密码等组成的hash
+            data.append('key', key)
+            data.append('file', fileObj[i].file)
+            axiosInstance({
+              method: 'POST',
+              url: url, // 上传地址
+              data: data,
+              timeout: 30000, // 超时时间，因为图片上传有可能需要很久
+              onUploadProgress: (progressEvent) => {
+                uploadProcess[i] = Math.round(progressEvent.loaded * 100 / progressEvent.total)
+                let t = 0
+                uploadProcess.forEach((e) => {
+                  t += e
                 })
-              })
-            }
-            console.log(data)
+                const process = Math.round(t / totalProcess)
+                console.log(process)
+                if (process === 100) {
+                  isComplete = true
+                }
+                this.uploadProcessingMessage = '正在上传图片' + Math.round(t / totalProcess) + '%'
+              }
+            }).then(data => {
+              this.data.attach[i] = data.data
+              // 如果全部上传完成, 隐藏上传toast
+              if (isComplete === true) {
+                console.log(this.data.attach)
+                this.data.attach = JSON.stringify(this.data.attach)
+                this.data.content = this.publish.zawazawaContent
+                publishPost(this.data).then((e) => {
+                  console.log(e)
+                  this.$bvToast.hide('uploading-toast')
+                  this.isPublishing = false
+                  // TODO 关闭modal
+                  this.$bvModal.hide('zawazawa-publish-modal')
+                  // toast 发布成功
+                  this.$bvToast.toast('发布成功', {
+                    autoHideDelay: 2000,
+                    solid: true,
+                    variant: 'success'
+                  })
+                })
+              }
+              console.log(data)
             // document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
             // 上传成功...  (登录七牛账号，找到七牛给你的 URL地址) 和 data里面的key 拼接成图片下载地址
-          }).catch(function (err) {
-            console.log(err)
+            }).catch(function (err) {
+              console.log(err)
             // 上传失败
-          })
-        }
+            })
+          }
         }
       })
     },
@@ -347,7 +355,6 @@ export default {
 
     // 获得输入框中字符长度
     getLength (val) {
-      console.log(val)
       const emojiExp = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g
 
       function estring (str) {
