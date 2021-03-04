@@ -285,7 +285,7 @@ export default {
             }).then(data => {
               this.data.attach[i] = data.data
               // 如果全部上传完成, 隐藏上传toast
-              if (isComplete === true) {
+              if (isComplete === true && this.data.attach.length === uploadLength) {
                 console.log(this.data.attach)
                 this.data.attach = JSON.stringify(this.data.attach)
                 this.data.content = this.publish.zawazawaContent
