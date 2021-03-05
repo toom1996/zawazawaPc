@@ -283,10 +283,16 @@ export default {
                 this.uploadProcessingMessage = '正在上传图片' + Math.round(t / totalProcess) + '%'
               }
             }).then(data => {
+              console.log('---------------i--->', i)
+              console.log('------------------>', data.data)
+              console.log('this.data.attach', this.data.attach)
+              if (typeof this.data.attach === 'string') {
+                this.data.attach = JSON.parse(this.data.attach)
+              }
               this.data.attach[i] = data.data
               // 如果全部上传完成, 隐藏上传toast
               if (isComplete === true && this.data.attach.length === uploadLength) {
-                console.log(this.data.attach)
+                console.log('完成了啊------------------------------------》')
                 this.data.attach = JSON.stringify(this.data.attach)
                 this.data.content = this.publish.zawazawaContent
                 publishPost(this.data).then((e) => {
@@ -303,7 +309,6 @@ export default {
                   })
                 })
               }
-              console.log(data)
             // document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
             // 上传成功...  (登录七牛账号，找到七牛给你的 URL地址) 和 data里面的key 拼接成图片下载地址
             }).catch(function (err) {

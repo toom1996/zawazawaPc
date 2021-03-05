@@ -87,7 +87,7 @@ axios.interceptors.response.use(
       const t = Math.round(new Date().getTime() / 1000).toString()
       console.log(t - state.zUser.issuing_time)
       // 超过生存时间
-      if (t - state.zUser.issuing_time >= 3600 && isRefreshing === false) {
+      if (t - state.zUser.issuing_time >= 1 && isRefreshing === false) {
         console.log('超时拉')
         isRefreshing = true
         refreshToken({
