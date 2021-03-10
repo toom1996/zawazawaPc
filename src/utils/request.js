@@ -65,7 +65,7 @@ axios.interceptors.response.use(
   (response) => {
     const res = response.data
     // 401 退出登陆
-    if (res.code === 401) {
+    if (res.code === HttpCode.UserErrTokenExpired || res.code === HttpCode.UserErrBadToken) {
       store.commit('setuserInfo', '')
       localStorage.removeItem('zUser')
       // 跳转到登陆页面
@@ -73,21 +73,16 @@ axios.interceptors.response.use(
     }
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== HttpCode.SUCCESS && res.code !== 401) {
-      v.$bvToast.toast(res.msg || '服务器异常', {
-        toaster: 'b-toaster-top-center',
-        autoHideDelay: 3000,
-        variant: 'warning',
-        appendToast: false
-      })
+    if (res.code !== HttpCode.Success && res.code !== 401) {
+      v.this.$toast(res.msg || '服务器异常')
       // return Promise.reject(new Error(''))
     }
-    if (res.code === HttpCode.SUCCESS) {
+    if (res.code === HttpCode.Success) {
       // 刷新token
       const t = Math.round(new Date().getTime() / 1000).toString()
       console.log(t - state.zUser.issuing_time)
       // 超过生存时间
-      if (t - state.zUser.issuing_time >= 1 && isRefreshing === false) {
+      if (t - state.zUser.issuing_time >= 3600 && isRefreshing === false) {
         console.log('超时拉')
         isRefreshing = true
         refreshToken({

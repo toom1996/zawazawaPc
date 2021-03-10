@@ -167,7 +167,7 @@ export default {
       smsSend({
         mobile: this.login.mobile
       }).then((e) => {
-        if (e.code === this.code.SUCCESS) {
+        if (e.code === this.code.Success) {
           this.$toast(e.msg)
         }
       })
@@ -186,7 +186,7 @@ export default {
 
       this.$store.commit('setIsLoginingHandle', true)
       register(this.login).then((res) => {
-        if (res.code === this.code.SUCCESS) {
+        if (res.code === this.code.Success) {
           this.$store.commit('setuserInfo', res.data)
           this.$router.push({ path: '/' })
         }

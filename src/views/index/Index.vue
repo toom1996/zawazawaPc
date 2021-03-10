@@ -246,7 +246,7 @@ export default {
       this.uploadProcessingMessage = '正在申请token'
       // 申请七牛云上传token
       getQiniuToken().then((e) => {
-        if (e.code === HttpCode.SUCCESS) {
+        if (e.code === HttpCode.Success) {
           const fileObj = this.publish.zawazawaContentImage
           const uploadLength = fileObj.length
           const totalProcess = uploadLength
