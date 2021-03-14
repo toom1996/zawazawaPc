@@ -74,7 +74,7 @@ axios.interceptors.response.use(
 
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== HttpCode.Success && res.code !== 401) {
-      v.this.$toast(res.msg || '服务器异常')
+      v.$toast(res.msg || '服务器异常')
       // return Promise.reject(new Error(''))
     }
     if (res.code === HttpCode.Success) {
@@ -100,13 +100,7 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    console.log(error)
-    v.$bvToast.toast('网络异常', {
-      toaster: 'b-toaster-top-center',
-      autoHideDelay: 3000,
-      variant: 'danger',
-      appendToast: false
-    })
+    v.$toast('服务器异常')
     return Promise.reject(error)
   }
 )

@@ -297,8 +297,6 @@ export default {
                 this.data.content = this.publish.zawazawaContent
                 publishPost(this.data).then((e) => {
                   console.log(e)
-                  this.$bvToast.hide('uploading-toast')
-                  this.isPublishing = false
                   // TODO 关闭modal
                   this.$bvModal.hide('zawazawa-publish-modal')
                   // toast 发布成功
@@ -308,6 +306,8 @@ export default {
                     variant: 'success'
                   })
                 })
+                this.$bvToast.hide('uploading-toast')
+                this.isPublishing = false
               }
             // document.getElementById('uploadFileInput').value = '' // 上传成功，把input的value设置为空，不然 无法两次选择同一张图片
             // 上传成功...  (登录七牛账号，找到七牛给你的 URL地址) 和 data里面的key 拼接成图片下载地址
