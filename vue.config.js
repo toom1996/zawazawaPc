@@ -4,6 +4,6 @@ module.exports = {
   lintOnSave: false, // 是否开启eslint
   devServer: {
     disableHostCheck: true,
-    port: 8081,
+    port: 8081
   }
 }
