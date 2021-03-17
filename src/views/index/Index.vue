@@ -215,6 +215,9 @@ import imageBlock from '@/components/common/ImageBlock'
 import HttpCode from '@/utils/code.js'
 
 export default {
+  created() {
+    
+  },
   components: {
     // eslint-disable-next-line vue/no-unused-components
     'avatar-group': avatarGroup,
@@ -464,7 +467,6 @@ export default {
       this.publish.zawazawaContentImage.splice(i, 1) // 结果arr=['a','c','d']（下标1开始，删除1个）
     }
   },
-  created () {},
   computed: {
     test1 () {
       console.log(this.publishProcessing)

@@ -127,8 +127,16 @@
 <script>
 import { validateMobile } from '@/utils/common.js'
 import { smsSend, register } from '@/api/user.js'
+import axios from 'axios'
 export default {
   mounted () {
+    console.log('1111111np')
+    axios.post("/login").then(response => {
+        if (response.data) {
+            console.log(response.data)
+            alert(response.data.name)
+        }
+    })
     // 如果已经登陆过的用户, 访问此页面将会返回首页
     if (this.$store.state.isLogin === true) {
       this.$router.push({ path: '/' })

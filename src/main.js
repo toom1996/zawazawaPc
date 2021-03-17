@@ -9,6 +9,7 @@ import 'font-awesome/css/font-awesome.min.css'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import HttpCode from './utils/code.js'
+import fake from './api/fake/mock.js' 
 
 import Notify from './components/common/Notify'
 

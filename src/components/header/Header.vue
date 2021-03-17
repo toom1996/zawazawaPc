@@ -2,7 +2,7 @@
   <div>
     <div
       id="header-nav"
-      class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm fixed-top"
+      class="d-flex flex-column flex-md-row align-items-center px-md-4 mb-3 bg-white border-bottom shadow-sm fixed-top"
     >
       <a class="navbar-brand" href="/">
         <div class="logo">
