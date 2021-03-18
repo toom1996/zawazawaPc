@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+// import './assets/css/typography.css'
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -9,8 +10,8 @@ import 'font-awesome/css/font-awesome.min.css'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import HttpCode from './utils/code.js'
-import fake from './api/fake/mock.js' 
-
+import fake from './api/fake/mock.js'
+import './assets/css/zawazawa.css'
 import Notify from './components/common/Notify'
 
 Vue.use(Toast, {

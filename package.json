@@ -17,6 +17,7 @@
     "js-md5": "^0.7.3",
     "mockjs": "^1.1.0",
     "qs": "^6.9.6",
+    "sass-loader": "^11.0.1",
     "view-design": "^4.5.0-beta.5",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

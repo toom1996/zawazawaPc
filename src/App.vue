@@ -27,12 +27,15 @@ export default {
 
 <style lang="less">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+ font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-style: normal;
   font-size: 14px;
+  line-height: 1.8;
+  padding: 0;
+  margin: 0;
+  color: #777d74;
+  background: #fafafb;
 }
 #nav {
   padding: 30px;

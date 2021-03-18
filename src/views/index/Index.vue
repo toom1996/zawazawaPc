@@ -2,68 +2,14 @@
   <div class="container">
     <Notify text='点我下载APP' />
     <div class="row">
+      <!-- left container -->
+      <left-container/>
+      <!-- center container -->
+      <center-container/>
       <!-- Main Content -->
       <div class="col col-xl-8 col-lg-8 col-md-8 col-sm-8 col-12">
         <div class="zawazawa-center-block mb-1">
           <div class="ui-block">
-            <div class="post-block mb-4">
-              <div class="post__author inline-items text-left mb-2">
-                <img
-                  class="mr-2"
-                  src="http://v.bootstrapmb.com/2019/6/mmjod5239/img/avatar7-sm.jpg"
-                  alt="author"
-                />
-                <div class="post__author">
-                  <a class="post__author-name" href="#">Elaine Dreyfuss</a>
-                  <div class="post__author-block">
-                    <span class="post__author-date" datetime="2004-07-24T18:18">
-                      9 hours ago</span
-                    >
-                  </div>
-                </div>
-              </div>
-              <p class="text-left">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempo incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                consequat.
-              </p>
-              <div class="post-attachment-block">
-                <img
-                  class="mr-2"
-                  src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3368953305,3282153653&fm=26&gp=0.jpg"
-                  alt="author"
-                />
-                <img
-                  class="mr-2"
-                  src="https://mmbiz.qpic.cn/mmbiz_gif/ZK1xPdHuks9bGV9mjWhgNTm1fQK0mEVEicUYPtFux5AWonf0ur6EpoibS1qmRFC5tAicufZ31iafdZthicD7Xiakd3tg/640?wx_fmt=gif"
-                  alt="author"
-                />
-                <img
-                  class="mr-2"
-                  src="http://toomhub.image.23cm.cn/tmp_c9566ac6e863b86fed927e92c480ca1c41b4219d57e9a48a.gif"
-                  alt="author"
-                />
-              </div>
-              <div class="control-block-button post-control-button">
-                <a
-                  v-b-popover.hover="popoverConfig"
-                  variant="primary"
-                  href="#"
-                  class="btn btn-control mb-1"
-                  ><i class="fa fa-heart"></i
-                  ><span
-                    class="control-block-like-count badge-dark"
-                    style="bottom: 0px; right: -0.3rem"
-                    >10+</span
-                  ></a
-                ><a href="#" class="btn btn-control mb-1"
-                  ><i class="fa fa-comment"></i></a
-                ><a href="#" class="btn btn-control"
-                  ><i class="fa fa-heart"></i
-                ></a>
-              </div>
-            </div>
             <div class="post-block mb-1">
               <div class="post__author inline-items text-left mb-2">
                 <img
@@ -212,16 +158,24 @@ import { publishPost } from '@/api/post.js'
 import axios from 'axios'
 import avatarGroup from '@/components/common/AvatarGroup'
 import imageBlock from '@/components/common/ImageBlock'
+// 左侧容器
+import leftContainer from '@/components/common/LeftContainer'
+
+// 中间容器
+import centerContainer from '@/components/common/CenterContainer'
+
 import HttpCode from '@/utils/code.js'
 
 export default {
-  created() {
-    
+  created () {
+
   },
   components: {
     // eslint-disable-next-line vue/no-unused-components
     'avatar-group': avatarGroup,
-    'image-block': imageBlock
+    'image-block': imageBlock,
+    'left-container': leftContainer,
+    'center-container': centerContainer
   },
   data: function () {
     return {
