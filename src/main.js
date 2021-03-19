@@ -3,14 +3,13 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 // import './assets/css/typography.css'
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
+import { BootstrapVue, BootstrapVueIcons, TooltipPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'font-awesome/css/font-awesome.min.css'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import HttpCode from './utils/code.js'
-import fake from './api/fake/mock.js'
 import './assets/css/zawazawa.css'
 import Notify from './components/common/Notify'
 
@@ -70,6 +69,7 @@ Vue.use(Toast, {
 })
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
+Vue.use(TooltipPlugin)
 Vue.component('Notify', Notify)
 Vue.config.productionTip = false
 Vue.prototype.code = HttpCode
