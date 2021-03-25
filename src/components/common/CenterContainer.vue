@@ -35,7 +35,7 @@
                         <ul>
                            <li class="mr-3">
                               <a class="font-size-14" href="#" id="navbarDropdown" data-toggle="dropdown">
-                              1 - 50 of 505
+                              1 - 50 of 50
                               </a>
                               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                  <a class="dropdown-item" href="#">20 per page</a>
